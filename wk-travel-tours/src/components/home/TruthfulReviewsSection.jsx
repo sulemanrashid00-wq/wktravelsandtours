@@ -62,6 +62,7 @@ export function TruthfulReviewsSection() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -186,23 +187,60 @@ export function TruthfulReviewsSection() {
     };
   }, [updateScrollButtons, reviews]);
 
+  // Auto-close modal after successful submission
+  useEffect(() => {
+    if (submissionSuccess) {
+      const timer = setTimeout(() => {
+        setIsSubmitModalOpen(false);
+        setSubmissionSuccess(false);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [submissionSuccess]);
+
   // Handle client review submission
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    setErrorMessage(null);
+
+    const name = formData.customerName.trim();
+    const comment = formData.comment.trim();
+    const trip = formData.tripReference.trim();
+
+    if (name.length < 2) {
+      setErrorMessage('Please provide your full name (minimum 2 characters).');
+      return;
+    }
+
+    if (comment.length < 5) {
+      setErrorMessage('Please share a few words about your journey (minimum 5 characters).');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          customerName: name,
+          rating: Number(formData.rating),
+          comment: comment,
+          tripReference: trip || 'General Agency Experience',
+        }),
       });
 
-      if (res.ok) {
+      const data = await res.json();
+
+      if (res.ok && data.success) {
         setSubmissionSuccess(true);
         setFormData({ customerName: '', rating: 5, comment: '', tripReference: '' });
+      } else {
+        setErrorMessage(data?.error || 'Failed to submit review. Please try again.');
       }
     } catch (err) {
       console.error('Error submitting review:', err);
+      setErrorMessage(err.message || 'An unexpected connection error occurred.');
     } finally {
       setIsSubmitting(false);
     }
@@ -241,6 +279,7 @@ export function TruthfulReviewsSection() {
               size="sm"
               onClick={() => {
                 setSubmissionSuccess(false);
+                setErrorMessage(null);
                 setIsSubmitModalOpen(true);
               }}
               className="text-xs"
@@ -459,6 +498,13 @@ export function TruthfulReviewsSection() {
               </div>
             ) : (
               <form onSubmit={handleSubmitReview} className="space-y-4 text-xs">
+                {errorMessage && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800 leading-relaxed flex items-start gap-2">
+                    <span className="font-bold text-red-600 flex-shrink-0">Notice:</span>
+                    <p className="flex-1">{errorMessage}</p>
+                  </div>
+                )}
+
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[#10263D] mb-1">
                     Your Full Name *

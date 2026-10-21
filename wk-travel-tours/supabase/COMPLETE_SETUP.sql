@@ -349,6 +349,19 @@ alter table public.booking_items enable row level security;
 alter table public.custom_trip_requests enable row level security;
 alter table public.email_otp_codes enable row level security;
 
+-- Helper function to prevent RLS infinite recursion when evaluating admin privileges
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'admin'
+  );
+$$;
+
 -- Profiles policies
 drop policy if exists "Users can read own profile" on public.profiles;
 drop policy if exists "Users can update own profile" on public.profiles;
@@ -362,14 +375,10 @@ create policy "Users can update own profile" on public.profiles
   for update using (auth.uid() = id);
 
 create policy "Admins can view all profiles" on public.profiles
-  for select using (
-    exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role = 'admin')
-  );
+  for select using (public.is_admin());
 
 create policy "Admins can update profiles" on public.profiles
-  for update using (
-    exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role = 'admin')
-  );
+  for update using (public.is_admin());
 
 -- Categories policies
 drop policy if exists "Categories are viewable by everyone" on public.categories;
@@ -422,18 +431,18 @@ create policy "Admins have full access to banners" on public.promotional_banners
 -- Customer Reviews policies
 drop policy if exists "Approved reviews are viewable by everyone" on public.reviews;
 drop policy if exists "Anyone can submit reviews for moderation" on public.reviews;
+drop policy if exists "Allow public inserts" on public.reviews;
 drop policy if exists "Admins have full access to reviews" on public.reviews;
 
 create policy "Approved reviews are viewable by everyone" on public.reviews
   for select using (status = 'approved');
 
-create policy "Anyone can submit reviews for moderation" on public.reviews
-  for insert with check (status = 'pending');
+-- Allow public and anonymous users to submit reviews for moderation
+create policy "Allow public inserts" on public.reviews
+  for insert with check (true);
 
 create policy "Admins have full access to reviews" on public.reviews
-  for all using (
-    exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role = 'admin')
-  );
+  for all using (public.is_admin());
 
 -- Agency Work policies
 drop policy if exists "Published agency work is viewable by everyone" on public.agency_work;

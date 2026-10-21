@@ -25,8 +25,8 @@ export function ReviewSubmissionForm({ onReviewSubmitted }) {
       return;
     }
 
-    if (comment.trim().length < 10) {
-      setErrorMessage('Please share a few sentences about your journey (minimum 10 characters).');
+    if (comment.trim().length < 5) {
+      setErrorMessage('Please share a few words about your journey (minimum 5 characters).');
       return;
     }
 

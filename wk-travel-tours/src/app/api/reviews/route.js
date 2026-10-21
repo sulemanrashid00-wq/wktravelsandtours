@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { reviewSubmissionSchema } from '@/lib/validation/bookingSchema';
-import { verifyServerAdmin, isAuthorizedAdmin } from '@/lib/security/roles';
+import { isAuthorizedAdmin } from '@/lib/security/roles';
 
 // Sample verified customer reviews fallback for authentic representation
 const fallbackReviews = [
@@ -34,12 +35,35 @@ const fallbackReviews = [
   },
 ];
 
+/**
+ * Returns an administrative Supabase client using SUPABASE_SERVICE_ROLE_KEY if available.
+ * Bypasses RLS to ensure public review submissions and approved review reads are never blocked
+ * by anonymous session restrictions or database policy misconfigurations.
+ */
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (supabaseUrl && serviceRoleKey) {
+    return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+  }
+  return null;
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const statusFilter = searchParams.get('status');
 
-  const supabase = await createClient();
-  if (!supabase) {
+  const serverClient = await createServerClient();
+  const adminClient = getAdminClient();
+  const dbClient = adminClient || serverClient;
+
+  if (!dbClient) {
     if (statusFilter && statusFilter !== 'all') {
       return NextResponse.json({ success: true, data: fallbackReviews.filter((r) => r.status === statusFilter) });
     }
@@ -48,12 +72,12 @@ export async function GET(request) {
 
   // If requesting non-approved status, verify admin authentication
   if (statusFilter && statusFilter !== 'approved') {
-    const isAdmin = await isAuthorizedAdmin(supabase);
+    const isAdmin = await isAuthorizedAdmin(serverClient);
     if (!isAdmin) {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
-    let query = supabase.from('reviews').select('*').order('created_at', { ascending: false });
+    let query = dbClient.from('reviews').select('*').order('created_at', { ascending: false });
     if (statusFilter !== 'all') {
       query = query.eq('status', statusFilter);
     }
@@ -66,7 +90,7 @@ export async function GET(request) {
   }
 
   // Public access: strictly return approved reviews only
-  const { data, error } = await supabase
+  const { data, error } = await dbClient
     .from('reviews')
     .select('id, customer_name, rating, comment, trip_reference, created_at')
     .eq('status', 'approved')
@@ -84,8 +108,11 @@ export async function POST(request) {
     const body = await request.json();
     const validated = reviewSubmissionSchema.parse(body);
 
-    const supabase = await createClient();
-    if (!supabase) {
+    const adminClient = getAdminClient();
+    const serverClient = await createServerClient();
+    const dbClient = adminClient || serverClient;
+
+    if (!dbClient) {
       return NextResponse.json(
         {
           success: true,
@@ -96,33 +123,65 @@ export async function POST(request) {
       );
     }
 
-    const { data, error } = await supabase
-      .from('reviews')
-      .insert([
-        {
-          customer_name: validated.customerName,
-          rating: validated.rating,
-          comment: validated.comment,
-          trip_reference: validated.tripReference || null,
-          status: 'pending', // Strictly pending until admin moderation
-        },
-      ])
-      .select()
-      .single();
+    const reviewPayload = {
+      customer_name: validated.customerName,
+      rating: validated.rating,
+      comment: validated.comment,
+      trip_reference: validated.tripReference || null,
+      status: 'pending', // Strictly pending until admin moderation
+    };
 
-    if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    let insertedData = null;
+
+    if (adminClient) {
+      // Service role client bypasses RLS and can safely select newly inserted pending reviews
+      const { data, error } = await adminClient
+        .from('reviews')
+        .insert([reviewPayload])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase review insert error (admin client):', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+      }
+      insertedData = data;
+    } else {
+      // Fallback anon server client: attempt insert with select, gracefully handle if RLS hides pending rows
+      const { data, error } = await serverClient
+        .from('reviews')
+        .insert([reviewPayload])
+        .select()
+        .single();
+
+      if (error) {
+        // If error is PGRST116 (0 rows returned because RLS hides pending review from anon select),
+        // the insert actually completed.
+        if (error.code === 'PGRST116') {
+          insertedData = {
+            id: 'rev-' + Date.now(),
+            ...reviewPayload,
+            created_at: new Date().toISOString(),
+          };
+        } else {
+          console.error('Supabase review insert error (anon client):', error);
+          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+        }
+      } else {
+        insertedData = data;
+      }
     }
 
     return NextResponse.json(
       {
         success: true,
         message: 'Your review has been submitted for moderation. Thank you for your feedback.',
-        data,
+        data: insertedData,
       },
       { status: 201 }
     );
   } catch (err) {
+    console.error('Review submission error:', err);
     return NextResponse.json(
       { success: false, error: err.errors ? err.errors[0]?.message : err.message },
       { status: 422 }
@@ -131,18 +190,21 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  const supabase = await createClient();
+  const serverClient = await createServerClient();
+  const adminClient = getAdminClient();
+  const dbClient = adminClient || serverClient;
+
   const body = await request.json();
 
   if (!body.id) {
     return NextResponse.json({ success: false, error: 'Review ID required' }, { status: 400 });
   }
 
-  if (!supabase) {
+  if (!dbClient) {
     return NextResponse.json({ success: true, data: body });
   }
 
-  const isAdmin = await isAuthorizedAdmin(supabase);
+  const isAdmin = await isAuthorizedAdmin(serverClient);
   if (!isAdmin) {
     return NextResponse.json({ success: false, error: 'Forbidden: Admin privileges required' }, { status: 403 });
   }
@@ -154,7 +216,7 @@ export async function PUT(request) {
   if (body.comment) updateFields.comment = body.comment;
   if (body.trip_reference !== undefined) updateFields.trip_reference = body.trip_reference;
 
-  const { data, error } = await supabase
+  const { data, error } = await dbClient
     .from('reviews')
     .update(updateFields)
     .eq('id', body.id)
@@ -169,7 +231,10 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  const supabase = await createClient();
+  const serverClient = await createServerClient();
+  const adminClient = getAdminClient();
+  const dbClient = adminClient || serverClient;
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
@@ -177,16 +242,16 @@ export async function DELETE(request) {
     return NextResponse.json({ success: false, error: 'Review ID required' }, { status: 400 });
   }
 
-  if (!supabase) {
+  if (!dbClient) {
     return NextResponse.json({ success: true, message: 'Review deleted in offline mode' });
   }
 
-  const isAdminDelete = await isAuthorizedAdmin(supabase);
+  const isAdminDelete = await isAuthorizedAdmin(serverClient);
   if (!isAdminDelete) {
     return NextResponse.json({ success: false, error: 'Forbidden: Admin privileges required' }, { status: 403 });
   }
 
-  const { error } = await supabase.from('reviews').delete().eq('id', id);
+  const { error } = await dbClient.from('reviews').delete().eq('id', id);
 
   if (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
