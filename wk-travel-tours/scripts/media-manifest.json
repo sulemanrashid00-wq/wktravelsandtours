@@ -1,0 +1,282 @@
+{
+  "generatedAt": "2026-10-19T03:31:55.014Z",
+  "sourceDirectory": "C:\\Users\\DELL\\wk travel agency web\\images",
+  "targetDirectory": "C:\\Users\\DELL\\wk travel agency web\\wk-travel-tours\\public\\images",
+  "totalFiles": 15,
+  "uniqueHashes": 14,
+  "files": [
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\family packages\\WhatsApp Image 2026-10-15 at 1.47.36 AM.jpeg",
+      "sourceRelativePath": "family packages/WhatsApp Image 2026-10-15 at 1.47.36 AM.jpeg",
+      "filename": "WhatsApp Image 2026-10-15 at 1.47.36 AM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 481900,
+      "sizeKB": 471,
+      "sha256": "29f8d10b8a95742ceaac2e4dcabac129c2291b4f90d7c5646c08ea4d6baa0b41",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "family",
+      "serviceType": "tour",
+      "title": "Family Customized Package: Journeys Beyond Boundaries",
+      "targetRelativePaths": [
+        "banners/family-package-banner.jpeg",
+        "packages/family-customized-package.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\friends packages\\WhatsApp Image 2026-10-17 at 12.27.07 PM.jpeg",
+      "sourceRelativePath": "friends packages/WhatsApp Image 2026-10-17 at 12.27.07 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-17 at 12.27.07 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 427168,
+      "sizeKB": 417,
+      "sha256": "3f5492d79f6b30ef9ecc7f92b09a2c5685bec3643ae61cfd069d60e6192e514e",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "friends",
+      "serviceType": "tour",
+      "title": "VIP Friends Package: Special Group Discounts (Min 4 Pax)",
+      "targetRelativePaths": [
+        "banners/friends-vip-banner.jpeg",
+        "packages/friends-vip-package.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\hanymoon packages\\WhatsApp Image 2026-10-15 at 1.45.56 AM.jpeg",
+      "sourceRelativePath": "hanymoon packages/WhatsApp Image 2026-10-15 at 1.45.56 AM.jpeg",
+      "filename": "WhatsApp Image 2026-10-15 at 1.45.56 AM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 469426,
+      "sizeKB": 458,
+      "sha256": "94aa1296480012bfb34c98e5ecc498fa95be91bde2f1df622e7d338787a1831e",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "honeymoon",
+      "serviceType": "tour",
+      "title": "Honeymoon Customized Package: Romantic Stays & Candlelit Dinners",
+      "targetRelativePaths": [
+        "banners/honeymoon-package-banner.jpeg",
+        "packages/honeymoon-customized-package.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\logo\\WhatsApp Image 2026-10-11 at 1.44.14 PM.jpeg",
+      "sourceRelativePath": "logo/WhatsApp Image 2026-10-11 at 1.44.14 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.44.14 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 154070,
+      "sizeKB": 150,
+      "sha256": "456c0473080906dcd4795a7d5e73690af27e8a9c97b38a75fa92b851505d5811",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "brand",
+      "serviceType": "branding",
+      "title": "WK Travel & Tours Official Crest & Logo",
+      "targetRelativePaths": [
+        "logo/wk-travel-logo.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.08 PM.jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.08 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.08 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 408342,
+      "sizeKB": 399,
+      "sha256": "107ad0ec13cf987b2f2eeaf7baacf4f82408e8ba0b09a2b57374a32fb04cd3e8",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "solo",
+      "serviceType": "tour",
+      "title": "Explore Thailand: Bangkok, Pattaya & Phuket",
+      "targetRelativePaths": [
+        "packages/thailand-bangkok-pattaya-phuket.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.09 PM (1).jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.09 PM (1).jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.09 PM (1).jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 334323,
+      "sizeKB": 326,
+      "sha256": "b4edcf0f3bf15484a88bc7aaa3a31f635f7ad9ad6ed6d447f54d5ac0785fec00",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "family",
+      "serviceType": "tour",
+      "title": "4-Country Asia Grand Tour: Sri Lanka, Malaysia, Thailand, Singapore",
+      "targetRelativePaths": [
+        "packages/asia-grand-tour-4-countries.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.09 PM.jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.09 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.09 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 377363,
+      "sizeKB": 369,
+      "sha256": "af9c37ed5afc345414cee893dcb753e0527e1feabd0dfd8235880c3b6e5c88ea",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "friends",
+      "serviceType": "tour",
+      "title": "5-Country Mega Asia Odyssey: Sri Lanka, Malaysia, Thailand, Indonesia, Vietnam",
+      "targetRelativePaths": [
+        "packages/asia-explorer-5-countries.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.10 PM (1).jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.10 PM (1).jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.10 PM (1).jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 416909,
+      "sizeKB": 407,
+      "sha256": "a7e1cfec60171876f89f854d18f4d2ba68e51a012351a49292143a6cfc0fa9bd",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "solo",
+      "serviceType": "tour",
+      "title": "Explore Baku: City of History, Culture & Modern Beauty",
+      "targetRelativePaths": [
+        "packages/baku-azerbaijan-tour.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.10 PM.jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.10 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.10 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 452645,
+      "sizeKB": 442,
+      "sha256": "aedb495403615833bf68ba8b7dda3c0956d600f02bde33e77da2dede87067fdd",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "family",
+      "serviceType": "tour",
+      "title": "Kuala Lumpur & Langkawi: City Vibes & Island Paradise",
+      "targetRelativePaths": [
+        "packages/malaysia-kuala-lumpur-langkawi.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.11 PM (1).jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.11 PM (1).jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.11 PM (1).jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 406607,
+      "sizeKB": 397,
+      "sha256": "6848747570d57adb0a5ea6153f5e2a8e1267efedd78273a3f622a21f35485934",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "solo",
+      "serviceType": "tour",
+      "title": "Explore Dubai: The City of Dreams",
+      "targetRelativePaths": [
+        "packages/dubai-city-of-dreams.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.11 PM.jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.11 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.11 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 416909,
+      "sizeKB": 407,
+      "sha256": "a7e1cfec60171876f89f854d18f4d2ba68e51a012351a49292143a6cfc0fa9bd",
+      "isDuplicate": true,
+      "duplicateOf": "solo packages/WhatsApp Image 2026-10-11 at 1.50.10 PM (1).jpeg",
+      "category": "solo",
+      "serviceType": "tour",
+      "title": "Explore Baku: City of History, Culture & Modern Beauty (Identical Duplicate)",
+      "targetRelativePaths": [
+        "packages/baku-azerbaijan-tour.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.12 PM.jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.12 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.12 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 398834,
+      "sizeKB": 389,
+      "sha256": "418fe8b2b2c279250328258610c3db4856eca5d720e313581ec0f0096d199aa0",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "honeymoon",
+      "serviceType": "tour",
+      "title": "Explore Turkey: Istanbul, Cappadocia & Antalya",
+      "targetRelativePaths": [
+        "packages/turkey-istanbul-cappadocia-antalya.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.14 PM (1).jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.14 PM (1).jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.14 PM (1).jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 299420,
+      "sizeKB": 292,
+      "sha256": "8fd5a9c4e8289f9d8507ee024bbe271324808284537b275b46607c949faedcb9",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "visa",
+      "serviceType": "visa",
+      "title": "4-in-1 Visit Visa Package (Sri Lanka, Malaysia, Thailand, Indonesia)",
+      "targetRelativePaths": [
+        "packages/4-in-1-visit-visa-package.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-11 at 1.50.14 PM.jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-11 at 1.50.14 PM.jpeg",
+      "filename": "WhatsApp Image 2026-10-11 at 1.50.14 PM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 454133,
+      "sizeKB": 443,
+      "sha256": "a6fadedfbd2000ebf7532727b4d758b6e400f5522d84f07b71b05b32847783ca",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "honeymoon",
+      "serviceType": "tour",
+      "title": "Explore Bali: Island of Gods",
+      "targetRelativePaths": [
+        "packages/bali-indonesia-island-of-gods.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    },
+    {
+      "sourcePath": "C:\\Users\\DELL\\wk travel agency web\\images\\solo packages\\WhatsApp Image 2026-10-18 at 3.12.22 AM.jpeg",
+      "sourceRelativePath": "solo packages/WhatsApp Image 2026-10-18 at 3.12.22 AM.jpeg",
+      "filename": "WhatsApp Image 2026-10-18 at 3.12.22 AM.jpeg",
+      "extension": ".jpeg",
+      "sizeBytes": 487003,
+      "sizeKB": 476,
+      "sha256": "fbd8ee184b18e06fb48c51bddf1bd85750255d42f60e6727721ffcf7865517ed",
+      "isDuplicate": false,
+      "duplicateOf": null,
+      "category": "solo",
+      "serviceType": "tour",
+      "title": "3-Country Asia Discovery: Sri Lanka, Malaysia & Thailand",
+      "targetRelativePaths": [
+        "packages/sri-lanka-malaysia-thailand.jpeg"
+      ],
+      "importStatus": "verified_imported"
+    }
+  ]
+}

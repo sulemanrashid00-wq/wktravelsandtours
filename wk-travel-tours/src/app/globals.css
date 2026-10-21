@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-surface: #f3f6f8;
+  --bg-dark: #10263d;
+  --text-primary: #10263d;
+  --text-muted: #586775;
+  --accent-teal: #087e83;
+  --accent-gold: #d97706;
+  --border-subtle: #e1e7eb;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessible focus ring without harsh shadows */
+:focus-visible {
+  outline: 2px solid #087e83;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f6f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c4d1db;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9db3c4;
+}
+
