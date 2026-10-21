@@ -76,29 +76,26 @@ export function TruthfulReviewsSection() {
   const pauseTimeoutRef = useRef(null);
 
   // Load live approved reviews
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchReviews() {
-      try {
-        const res = await fetch('/api/reviews');
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-            if (isMounted) setReviews(json.data);
-            return;
-          }
+  const fetchReviews = useCallback(async () => {
+    try {
+      const res = await fetch('/api/reviews', { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setReviews(json.data);
+          return;
         }
-      } catch (err) {
-        console.error('Error fetching approved reviews:', err);
-      } finally {
-        if (isMounted) setLoading(false);
       }
+    } catch (err) {
+      console.error('Error fetching approved reviews:', err);
+    } finally {
+      setLoading(false);
     }
-    fetchReviews();
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   // Check prefers-reduced-motion
   useEffect(() => {
@@ -235,6 +232,7 @@ export function TruthfulReviewsSection() {
       if (res.ok && data.success) {
         setSubmissionSuccess(true);
         setFormData({ customerName: '', rating: 5, comment: '', tripReference: '' });
+        fetchReviews();
       } else {
         setErrorMessage(data?.error || 'Failed to submit review. Please try again.');
       }

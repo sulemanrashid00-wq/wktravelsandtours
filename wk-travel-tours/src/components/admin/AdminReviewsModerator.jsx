@@ -37,7 +37,7 @@ export function AdminReviewsModerator() {
   const loadReviews = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/reviews?status=all', { credentials: 'same-origin' });
+      const res = await fetch('/api/reviews?status=all', { credentials: 'same-origin', cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {

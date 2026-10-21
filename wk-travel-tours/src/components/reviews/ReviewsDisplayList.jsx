@@ -11,7 +11,7 @@ export function ReviewsDisplayList({ refreshKey }) {
     let isMounted = true;
     async function fetchReviews() {
       try {
-        const res = await fetch('/api/reviews');
+        const res = await fetch('/api/reviews', { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (isMounted && json.data) {

@@ -4,6 +4,9 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { reviewSubmissionSchema } from '@/lib/validation/bookingSchema';
 import { isAuthorizedAdmin } from '@/lib/security/roles';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Sample verified customer reviews fallback for authentic representation
 const fallbackReviews = [
   {
