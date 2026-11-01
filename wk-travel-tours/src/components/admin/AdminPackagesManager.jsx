@@ -319,7 +319,7 @@ export function AdminPackagesManager() {
       displayOrder: 10,
       packageType: 'standard',
       badge: '',
-      primaryImage: '/images/packages/thailand-bangkok-pattaya-phuket.jpeg',
+      primaryImage: '',
       inclusionsText: 'Return Air Ticket\nStandard Hotel Accommodation\nDaily Breakfast Included\nAirport Meet & Greet Transfers',
       exclusionsText: 'Consular Visa Processing Fees\nPersonal Expenses & Porterage\nOptional City Excursions',
       highlightsText: 'Guided City Sightseeing Tour\nCaspian Waterfront Walkway\nTraditional Cultural Bazar Visit',
@@ -337,12 +337,9 @@ export function AdminPackagesManager() {
     } else {
       updated = [...current, catSlug];
     }
-    setEditingPackage({
-      ...editingPackage,
-      allowedCategories: updated,
+    setEditingPackage((prev) => ({ ...prev, allowedCategories: updated,
       // If primary category is removed, assign first in updated
-      category: updated.includes(editingPackage.category) ? editingPackage.category : updated[0],
-    });
+      category: updated.includes(editingPackage.category) ? editingPackage.category : updated[0], }));
   };
 
   // Filter packages
@@ -823,7 +820,7 @@ export function AdminPackagesManager() {
                   <input
                     type="text"
                     value={editingPackage?.title || ''}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, title: e.target.value })}
+                    onChange={(e) => setEditingPackage((prev) => ({ ...prev, title: e.target.value }))}
                     required
                     placeholder="e.g. Explore Thailand: Bangkok, Pattaya & Phuket"
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -837,7 +834,7 @@ export function AdminPackagesManager() {
                   <input
                     type="text"
                     value={editingPackage?.slug || ''}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, slug: e.target.value })}
+                    onChange={(e) => setEditingPackage((prev) => ({ ...prev, slug: e.target.value }))}
                     required
                     placeholder="e.g. thailand-bangkok-pattaya-phuket"
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] font-mono focus:outline-none focus:border-[#087E83]"
@@ -854,7 +851,7 @@ export function AdminPackagesManager() {
                   <input
                     type="text"
                     value={editingPackage?.destination || ''}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, destination: e.target.value })}
+                    onChange={(e) => setEditingPackage((prev) => ({ ...prev, destination: e.target.value }))}
                     required
                     placeholder="e.g. Thailand"
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -868,7 +865,7 @@ export function AdminPackagesManager() {
                   <input
                     type="text"
                     value={editingPackage?.duration || ''}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, duration: e.target.value })}
+                    onChange={(e) => setEditingPackage((prev) => ({ ...prev, duration: e.target.value }))}
                     required
                     placeholder="e.g. 7 Days / 6 Nights"
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -885,10 +882,7 @@ export function AdminPackagesManager() {
                     max="60"
                     value={editingPackage?.durationDays || 7}
                     onChange={(e) =>
-                      setEditingPackage({
-                        ...editingPackage,
-                        durationDays: parseInt(e.target.value, 10) || 1,
-                      })
+                      setEditingPackage((prev) => ({ ...prev, durationDays: parseInt(e.target.value, 10) || 1, }))
                     }
                     required
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -907,10 +901,7 @@ export function AdminPackagesManager() {
                     min="1"
                     value={editingPackage?.price || 0}
                     onChange={(e) =>
-                      setEditingPackage({
-                        ...editingPackage,
-                        price: parseInt(e.target.value, 10) || 0,
-                      })
+                      setEditingPackage((prev) => ({ ...prev, price: parseInt(e.target.value, 10) || 0, }))
                     }
                     required
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -923,7 +914,7 @@ export function AdminPackagesManager() {
                   </label>
                   <select
                     value={editingPackage?.pricingBasis || 'per_person'}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, pricingBasis: e.target.value })}
+                    onChange={(e) => setEditingPackage((prev) => ({ ...prev, pricingBasis: e.target.value }))}
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
                   >
                     <option value="per_person">Per Person (Twin Sharing)</option>
@@ -938,7 +929,7 @@ export function AdminPackagesManager() {
                   </label>
                   <select
                     value={editingPackage?.serviceType || 'tour'}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, serviceType: e.target.value })}
+                    onChange={(e) => setEditingPackage((prev) => ({ ...prev, serviceType: e.target.value }))}
                     className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
                   >
                     <option value="tour">Holiday Tour Package</option>
@@ -990,7 +981,7 @@ export function AdminPackagesManager() {
                     </label>
                     <select
                       value={editingPackage?.category || 'solo'}
-                      onChange={(e) => setEditingPackage({ ...editingPackage, category: e.target.value })}
+                      onChange={(e) => setEditingPackage((prev) => ({ ...prev, category: e.target.value }))}
                       className="w-full text-xs bg-white border border-[#E1E7EB] rounded px-3 py-1.5 text-[#10263D]"
                     >
                       {ALL_CATEGORY_OPTIONS.map((c) => (
@@ -1007,7 +998,7 @@ export function AdminPackagesManager() {
                       id="isFeaturedToggle"
                       checked={editingPackage?.isFeatured || false}
                       onChange={(e) =>
-                        setEditingPackage({ ...editingPackage, isFeatured: e.target.checked })
+                        setEditingPackage((prev) => ({ ...prev, isFeatured: e.target.checked }))
                       }
                       className="rounded text-[#087E83] focus:ring-[#087E83]"
                     />
@@ -1022,7 +1013,7 @@ export function AdminPackagesManager() {
                       id="isActiveToggle"
                       checked={editingPackage?.isActive !== false}
                       onChange={(e) =>
-                        setEditingPackage({ ...editingPackage, isActive: e.target.checked })
+                        setEditingPackage((prev) => ({ ...prev, isActive: e.target.checked }))
                       }
                       className="rounded text-[#087E83] focus:ring-[#087E83]"
                     />
@@ -1038,11 +1029,8 @@ export function AdminPackagesManager() {
                       id="isCustomizedToggle"
                       checked={editingPackage?.isCustomized || false}
                       onChange={(e) =>
-                        setEditingPackage({
-                          ...editingPackage,
-                          isCustomized: e.target.checked,
-                          packageType: e.target.checked ? 'customized' : 'standard',
-                        })
+                        setEditingPackage((prev) => ({ ...prev, isCustomized: e.target.checked,
+                          packageType: e.target.checked ? 'customized' : 'standard', }))
                       }
                       className="rounded text-[#087E83] focus:ring-[#087E83]"
                     />
@@ -1062,10 +1050,7 @@ export function AdminPackagesManager() {
                       max="999"
                       value={editingPackage?.displayOrder ?? 10}
                       onChange={(e) =>
-                        setEditingPackage({
-                          ...editingPackage,
-                          displayOrder: parseInt(e.target.value, 10) || 10,
-                        })
+                        setEditingPackage((prev) => ({ ...prev, displayOrder: parseInt(e.target.value, 10) || 10, }))
                       }
                       className="w-full text-xs bg-white border border-[#E1E7EB] rounded px-3 py-1.5 text-[#10263D]"
                     />
@@ -1081,7 +1066,7 @@ export function AdminPackagesManager() {
                 <input
                   type="text"
                   value={editingPackage?.subtitle || ''}
-                  onChange={(e) => setEditingPackage({ ...editingPackage, subtitle: e.target.value })}
+                  onChange={(e) => setEditingPackage((prev) => ({ ...prev, subtitle: e.target.value }))}
                   placeholder="e.g. City Lights, Beaches, Fun, Island Vibes & Nature"
                   className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
                 />
@@ -1091,7 +1076,7 @@ export function AdminPackagesManager() {
               <div className="p-4 bg-[#F3F6F8] border border-[#E1E7EB] rounded-xl">
                 <ImageUploadInput
                   value={editingPackage?.primaryImage || ''}
-                  onChange={(newUrl) => setEditingPackage({ ...editingPackage, primaryImage: newUrl })}
+                  onChange={(newUrl) => setEditingPackage((prev) => ({ ...prev, primaryImage: newUrl }))}
                   onUploadStateChange={(uploading) => setIsUploadingImage(uploading)}
                   bucket="packages"
                   prefix={editingPackage?.slug || 'package'}
@@ -1113,7 +1098,7 @@ export function AdminPackagesManager() {
                     rows={4}
                     value={editingPackage?.inclusionsText || ''}
                     onChange={(e) =>
-                      setEditingPackage({ ...editingPackage, inclusionsText: e.target.value })
+                      setEditingPackage((prev) => ({ ...prev, inclusionsText: e.target.value }))
                     }
                     placeholder="Return Air Ticket&#10;Hotel Stay (Twin Sharing)&#10;Daily Breakfast"
                     className="w-full text-xs bg-white border border-[#E1E7EB] rounded p-2.5 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -1128,7 +1113,7 @@ export function AdminPackagesManager() {
                     rows={4}
                     value={editingPackage?.exclusionsText || ''}
                     onChange={(e) =>
-                      setEditingPackage({ ...editingPackage, exclusionsText: e.target.value })
+                      setEditingPackage((prev) => ({ ...prev, exclusionsText: e.target.value }))
                     }
                     placeholder="Consular Visa Fees&#10;Personal Expenses&#10;Lunch & Dinner"
                     className="w-full text-xs bg-white border border-[#E1E7EB] rounded p-2.5 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -1146,7 +1131,7 @@ export function AdminPackagesManager() {
                     rows={3}
                     value={editingPackage?.highlightsText || ''}
                     onChange={(e) =>
-                      setEditingPackage({ ...editingPackage, highlightsText: e.target.value })
+                      setEditingPackage((prev) => ({ ...prev, highlightsText: e.target.value }))
                     }
                     placeholder="Coral Island Speedboat Tour with Lunch&#10;Phuket City Tour&#10;Chao Phraya River Cruise"
                     className="w-full text-xs bg-white border border-[#E1E7EB] rounded p-2.5 text-[#10263D] focus:outline-none focus:border-[#087E83]"
@@ -1161,7 +1146,7 @@ export function AdminPackagesManager() {
                     rows={3}
                     value={editingPackage?.importantNotes || ''}
                     onChange={(e) =>
-                      setEditingPackage({ ...editingPackage, importantNotes: e.target.value })
+                      setEditingPackage((prev) => ({ ...prev, importantNotes: e.target.value }))
                     }
                     placeholder="Passport must be valid for at least 6 months. Flight rates are subject to airline availability."
                     className="w-full text-xs bg-white border border-[#E1E7EB] rounded p-2.5 text-[#10263D] focus:outline-none focus:border-[#087E83]"

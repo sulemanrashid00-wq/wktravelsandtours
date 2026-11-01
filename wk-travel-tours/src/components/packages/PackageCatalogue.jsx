@@ -113,7 +113,7 @@ export function PackageCatalogue() {
         // Default featured
         return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
       });
-  }, [search, selectedCategory, budgetFilter, durationFilter, sortBy]);
+  }, [allPackages, search, selectedCategory, budgetFilter, durationFilter, sortBy]);
 
   const handleResetFilters = () => {
     setSearch('');

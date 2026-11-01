@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signInWithEmail } from '@/services/authService';
@@ -32,6 +32,7 @@ function LoginForm() {
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const [loading, setLoading] = useState(false);
+  const isSubmittingRef = useRef(false);
   const [errorMessage, setErrorMessage] = useState(
     unauthorizedError
       ? 'Administrative verification required. Please sign in with verified credentials.'
@@ -59,6 +60,8 @@ function LoginForm() {
   // Request 4-digit code
   const handleSendOtp = async (e) => {
     if (e) e.preventDefault();
+    if (isSubmittingRef.current || loading) return;
+
     setErrorMessage('');
     setSuccessNotice('');
 
@@ -68,6 +71,7 @@ function LoginForm() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setLoading(true);
     try {
       const res = await fetch('/api/auth/otp/send', {
@@ -87,6 +91,7 @@ function LoginForm() {
     } catch (err) {
       setErrorMessage(err.message || 'Unable to dispatch verification code. Please try again.');
     } finally {
+      isSubmittingRef.current = false;
       setLoading(false);
     }
   };
@@ -94,6 +99,8 @@ function LoginForm() {
   // Verify 4-digit code
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
+    if (isSubmittingRef.current || loading) return;
+
     setErrorMessage('');
 
     const cleanCode = otpCode.trim();
@@ -102,6 +109,7 @@ function LoginForm() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setLoading(true);
     try {
       const res = await fetch('/api/auth/otp/verify', {
@@ -127,6 +135,7 @@ function LoginForm() {
     } catch (err) {
       setErrorMessage(err.message || 'Invalid or expired verification code.');
     } finally {
+      isSubmittingRef.current = false;
       setLoading(false);
     }
   };
@@ -134,6 +143,8 @@ function LoginForm() {
   // Password sign-in using actual configured provider
   const handlePasswordSignIn = async (e) => {
     e.preventDefault();
+    if (isSubmittingRef.current || loading) return;
+
     setErrorMessage('');
     setSuccessNotice('');
 
@@ -143,6 +154,7 @@ function LoginForm() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setLoading(true);
     try {
       await signInWithEmail(cleanEmail, password);
@@ -156,6 +168,7 @@ function LoginForm() {
         err.message || 'Authentication failed. Please verify your email and password.'
       );
     } finally {
+      isSubmittingRef.current = false;
       setLoading(false);
     }
   };

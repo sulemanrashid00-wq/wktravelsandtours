@@ -1,8 +1,24 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { initialPackages } from '@/config/initialData';
 import { packageSchema } from '@/lib/validation/packageSchema';
 import { verifyServerAdmin, isAuthorizedAdmin } from '@/lib/security/roles';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+function getStorageAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && serviceKey) {
+    return createSupabaseClient(supabaseUrl, serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+  return null;
+}
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -133,6 +149,17 @@ export async function POST(request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 
+  // Next.js Cache Invalidation across all affected public routes
+  try {
+    revalidatePath('/', 'page');
+    revalidatePath('/packages', 'page');
+    if (data?.slug) {
+      revalidatePath(`/packages/${data.slug}`, 'page');
+    }
+  } catch (revErr) {
+    console.warn('Cache revalidation notice:', revErr.message);
+  }
+
   return NextResponse.json({ success: true, data }, { status: 201 });
 }
 
@@ -167,6 +194,15 @@ export async function PUT(request) {
       { status: 403 }
     );
   }
+
+  // Fetch current package before update to identify previous image
+  const { data: existingPkg } = await supabase
+    .from('packages')
+    .select('primary_image')
+    .eq('id', packageId)
+    .single();
+
+  const oldImage = existingPkg?.primary_image;
 
   const { data, error } = await supabase
     .from('packages')
@@ -207,6 +243,47 @@ export async function PUT(request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 
+  // Invalidate Next.js cache so updated package displays immediately
+  try {
+    revalidatePath('/', 'page');
+    revalidatePath('/packages', 'page');
+    if (data?.slug) {
+      revalidatePath(`/packages/${data.slug}`, 'page');
+    }
+  } catch (revErr) {
+    console.warn('Cache revalidation notice:', revErr.message);
+  }
+
+  // Clean up replaced Supabase storage image safely if it was replaced and not referenced elsewhere
+  if (
+    oldImage &&
+    data.primary_image &&
+    oldImage !== data.primary_image &&
+    oldImage.includes('/storage/v1/object/public/packages/')
+  ) {
+    try {
+      // Check if any other package record uses this exact image
+      const { data: sharedUsage } = await supabase
+        .from('packages')
+        .select('id')
+        .eq('primary_image', oldImage)
+        .neq('id', packageId);
+
+      if (!sharedUsage || sharedUsage.length === 0) {
+        const urlParts = oldImage.split('/storage/v1/object/public/packages/');
+        const oldFilePath = urlParts[1];
+        if (oldFilePath) {
+          const storageAdmin = getStorageAdminClient();
+          if (storageAdmin) {
+            await storageAdmin.storage.from('packages').remove([oldFilePath]);
+          }
+        }
+      }
+    } catch (cleanupErr) {
+      console.warn('Safe storage cleanup warning (non-blocking):', cleanupErr.message);
+    }
+  }
+
   return NextResponse.json({ success: true, data });
 }
 
@@ -231,10 +308,51 @@ export async function DELETE(request) {
     );
   }
 
+  // Fetch package to get slug and image before deletion
+  const { data: pkgToDelete } = await supabase
+    .from('packages')
+    .select('slug, primary_image')
+    .eq('id', id)
+    .single();
+
   const { error } = await supabase.from('packages').delete().eq('id', id);
 
   if (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+  }
+
+  // Next.js Cache Invalidation
+  try {
+    revalidatePath('/', 'page');
+    revalidatePath('/packages', 'page');
+    if (pkgToDelete?.slug) {
+      revalidatePath(`/packages/${pkgToDelete.slug}`, 'page');
+    }
+  } catch (revErr) {
+    console.warn('Cache revalidation notice:', revErr.message);
+  }
+
+  // Safe storage cleanup if unshared
+  if (pkgToDelete?.primary_image && pkgToDelete.primary_image.includes('/storage/v1/object/public/packages/')) {
+    try {
+      const { data: otherMatches } = await supabase
+        .from('packages')
+        .select('id')
+        .eq('primary_image', pkgToDelete.primary_image);
+
+      if (!otherMatches || otherMatches.length === 0) {
+        const urlParts = pkgToDelete.primary_image.split('/storage/v1/object/public/packages/');
+        const filePath = urlParts[1];
+        if (filePath) {
+          const storageAdmin = getStorageAdminClient();
+          if (storageAdmin) {
+            await storageAdmin.storage.from('packages').remove([filePath]);
+          }
+        }
+      }
+    } catch (cleanupErr) {
+      console.warn('Safe storage deletion cleanup notice:', cleanupErr.message);
+    }
   }
 
   return NextResponse.json({ success: true, message: 'Package deleted successfully' });

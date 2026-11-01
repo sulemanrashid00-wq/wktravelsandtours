@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -14,6 +14,7 @@ import {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const isSubmittingRef = useRef(false);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -32,6 +33,8 @@ export default function RegisterPage() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (isSubmittingRef.current || loading) return;
+
     setErrorMessage('');
 
     // Client-side validations
@@ -64,6 +67,7 @@ export default function RegisterPage() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setLoading(true);
 
     try {
@@ -92,6 +96,7 @@ export default function RegisterPage() {
     } catch (err) {
       setErrorMessage(err.message || 'An error occurred during account creation.');
     } finally {
+      isSubmittingRef.current = false;
       setLoading(false);
     }
   };
