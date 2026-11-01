@@ -28,6 +28,16 @@ export function normalizePackage(item) {
     ? item.categories
     : [category];
 
+  const resolvedImage =
+    item.primary_image ||
+    item.primaryImage ||
+    item.image_url ||
+    item.imageUrl ||
+    item.cover_image ||
+    item.coverImage ||
+    item.image ||
+    '';
+
   return {
     ...item,
     id: item.id,
@@ -40,7 +50,10 @@ export function normalizePackage(item) {
     duration: item.duration || `${item.duration_days || item.durationDays || 7} Days`,
     durationDays: item.duration_days ?? item.durationDays ?? 7,
     pricingBasis: item.pricing_basis || item.pricingBasis || 'per_person',
-    primaryImage: item.primary_image || item.primaryImage || '/images/packages/asia-grand-tour-4-countries.jpeg',
+    primaryImage: resolvedImage,
+    primary_image: resolvedImage,
+    image: resolvedImage,
+    imageUrl: resolvedImage,
     galleryImages: item.gallery_images || item.galleryImages || [],
     isFeatured: item.is_featured ?? item.isFeatured ?? false,
     isActive: item.is_active ?? item.isActive ?? true,
@@ -60,7 +73,6 @@ export function normalizePackage(item) {
     itinerary: Array.isArray(item.itinerary) ? item.itinerary : [],
     // Database mirror
     pricing_basis: item.pricing_basis || item.pricingBasis || 'per_person',
-    primary_image: item.primary_image || item.primaryImage || '/images/packages/asia-grand-tour-4-countries.jpeg',
     is_featured: item.is_featured ?? item.isFeatured ?? false,
     is_active: item.is_active ?? item.isActive ?? true,
     allowed_categories: allowed,

@@ -110,6 +110,18 @@ export async function POST(request) {
     );
   }
 
+  // Extract image strictly, supporting any property alias
+  const finalImage =
+    validated.primaryImage ||
+    validated.primary_image ||
+    validated.image ||
+    validated.imageUrl ||
+    body.primaryImage ||
+    body.primary_image ||
+    body.image ||
+    body.imageUrl ||
+    '';
+
   const { data, error } = await supabase
     .from('packages')
     .insert([
@@ -128,7 +140,7 @@ export async function POST(request) {
         service_type: validated.serviceType || 'tour',
         departure_info: validated.departureInfo || null,
         badge: validated.badge || null,
-        primary_image: validated.primaryImage,
+        primary_image: finalImage,
         gallery_images: validated.galleryImages,
         inclusions: validated.inclusions,
         exclusions: validated.exclusions,
@@ -151,8 +163,10 @@ export async function POST(request) {
 
   // Next.js Cache Invalidation across all affected public routes
   try {
+    revalidatePath('/', 'layout');
     revalidatePath('/', 'page');
-    revalidatePath('/packages', 'page');
+    revalidatePath('/packages');
+    revalidatePath('/packages', 'layout');
     if (data?.slug) {
       revalidatePath(`/packages/${data.slug}`, 'page');
     }
@@ -204,6 +218,19 @@ export async function PUT(request) {
 
   const oldImage = existingPkg?.primary_image;
 
+  // Preserve existing image if not replacing with a new one
+  const finalImage =
+    validated.primaryImage ||
+    validated.primary_image ||
+    validated.image ||
+    validated.imageUrl ||
+    body.primaryImage ||
+    body.primary_image ||
+    body.image ||
+    body.imageUrl ||
+    oldImage ||
+    '';
+
   const { data, error } = await supabase
     .from('packages')
     .update({
@@ -221,7 +248,7 @@ export async function PUT(request) {
       service_type: validated.serviceType || 'tour',
       departure_info: validated.departureInfo || null,
       badge: validated.badge || null,
-      primary_image: validated.primaryImage,
+      primary_image: finalImage,
       gallery_images: validated.galleryImages,
       inclusions: validated.inclusions,
       exclusions: validated.exclusions,
@@ -245,8 +272,10 @@ export async function PUT(request) {
 
   // Invalidate Next.js cache so updated package displays immediately
   try {
+    revalidatePath('/', 'layout');
     revalidatePath('/', 'page');
-    revalidatePath('/packages', 'page');
+    revalidatePath('/packages');
+    revalidatePath('/packages', 'layout');
     if (data?.slug) {
       revalidatePath(`/packages/${data.slug}`, 'page');
     }
@@ -323,8 +352,10 @@ export async function DELETE(request) {
 
   // Next.js Cache Invalidation
   try {
+    revalidatePath('/', 'layout');
     revalidatePath('/', 'page');
-    revalidatePath('/packages', 'page');
+    revalidatePath('/packages');
+    revalidatePath('/packages', 'layout');
     if (pkgToDelete?.slug) {
       revalidatePath(`/packages/${pkgToDelete.slug}`, 'page');
     }

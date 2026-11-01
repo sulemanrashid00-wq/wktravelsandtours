@@ -160,8 +160,11 @@ export function AdminPackagesManager() {
     setIsSubmitting(true);
 
     try {
+      const resolvedImg = editingPackage.primaryImage || editingPackage.primary_image || editingPackage.imageUrl || editingPackage.image_url || editingPackage.image || '';
       const payload = {
         ...editingPackage,
+        primaryImage: resolvedImg,
+        primary_image: resolvedImg,
         price: parseInt(editingPackage.price, 10) || 0,
         durationDays: parseInt(editingPackage.durationDays, 10) || 1,
         inclusions: Array.isArray(editingPackage.inclusions)
@@ -235,8 +238,8 @@ export function AdminPackagesManager() {
         isCustomized: editingPackage.isCustomized ?? false,
         packageType: editingPackage.isCustomized ? 'customized' : (editingPackage.packageType || 'standard'),
         displayOrder: parseInt(editingPackage.displayOrder, 10) || 10,
-        primaryImage:
-          editingPackage.primaryImage || '/images/packages/thailand-bangkok-pattaya-phuket.jpeg',
+        primaryImage: editingPackage.primaryImage || editingPackage.primary_image || '',
+        primary_image: editingPackage.primaryImage || editingPackage.primary_image || '',
         inclusions: (editingPackage.inclusionsText || '')
           .split('\n')
           .map((s) => s.trim())
@@ -286,8 +289,11 @@ export function AdminPackagesManager() {
   };
 
   const openEditModal = (pkg) => {
+    const existingImg = pkg.primaryImage || pkg.primary_image || pkg.imageUrl || pkg.image_url || pkg.image || '';
     setEditingPackage({
       ...pkg,
+      primaryImage: existingImg,
+      primary_image: existingImg,
       isCustomized: pkg.isCustomized ?? pkg.is_customized ?? false,
       displayOrder: pkg.displayOrder ?? pkg.display_order ?? 10,
       packageType: pkg.packageType ?? pkg.package_type ?? 'standard',
@@ -467,7 +473,7 @@ export function AdminPackagesManager() {
           </div>
         ) : (
           filtered.map((pkg) => {
-            const displayImg = resolveImageUrl(pkg.primaryImage, 'package');
+            const displayImg = resolveImageUrl(pkg.primaryImage || pkg.primary_image || pkg.imageUrl || pkg.image_url || pkg.image, 'package');
             return (
               <div
                 key={pkg.id}
@@ -615,7 +621,7 @@ export function AdminPackagesManager() {
               </tr>
             ) : (
               filtered.map((pkg) => {
-                const displayImg = resolveImageUrl(pkg.primaryImage, 'package');
+                const displayImg = resolveImageUrl(pkg.primaryImage || pkg.primary_image || pkg.imageUrl || pkg.image_url || pkg.image, 'package');
                 return (
                   <tr key={pkg.id} className="hover:bg-[#F3F6F8]/60 transition-colors">
                     {/* Title & Image */}
@@ -1075,8 +1081,8 @@ export function AdminPackagesManager() {
               {/* Real Media Management with Cloud Storage Upload */}
               <div className="p-4 bg-[#F3F6F8] border border-[#E1E7EB] rounded-xl">
                 <ImageUploadInput
-                  value={editingPackage?.primaryImage || ''}
-                  onChange={(newUrl) => setEditingPackage((prev) => ({ ...prev, primaryImage: newUrl }))}
+                  value={editingPackage?.primaryImage || editingPackage?.primary_image || ''}
+                  onChange={(newUrl) => setEditingPackage((prev) => ({ ...prev, primaryImage: newUrl, primary_image: newUrl }))}
                   onUploadStateChange={(uploading) => setIsUploadingImage(uploading)}
                   bucket="packages"
                   prefix={editingPackage?.slug || 'package'}

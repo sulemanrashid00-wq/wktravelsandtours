@@ -1,6 +1,9 @@
 import React, { Suspense } from 'react';
 import { PackageCatalogue } from '@/components/packages/PackageCatalogue';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata = {
   title: 'All Tour Packages & Visit Visas | WK Travel & Tours',
   description:

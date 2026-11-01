@@ -16,6 +16,8 @@ import {
   IconShieldCheck,
 } from '@/components/ui/Icons';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
@@ -135,13 +137,29 @@ export default async function PackageDetailPage({ params }) {
           <div className="lg:col-span-5 bg-[#10263D] rounded-xl p-3 sm:p-5 border border-[#E1E7EB] shadow-sm">
             <div className="relative aspect-[3/4] w-full max-w-md mx-auto rounded overflow-hidden">
               <Image
-                src={resolveImageUrl(pkg.primaryImage, 'package')}
+                src={resolveImageUrl(
+                  pkg.primary_image ||
+                    pkg.primaryImage ||
+                    pkg.image_url ||
+                    pkg.imageUrl ||
+                    pkg.cover_image ||
+                    pkg.image,
+                  'package'
+                )}
                 alt={pkg.title}
                 fill
                 priority
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 40vw"
-                unoptimized={resolveImageUrl(pkg.primaryImage, 'package').startsWith('http')}
+                unoptimized={resolveImageUrl(
+                  pkg.primary_image ||
+                    pkg.primaryImage ||
+                    pkg.image_url ||
+                    pkg.imageUrl ||
+                    pkg.cover_image ||
+                    pkg.image,
+                  'package'
+                ).startsWith('http')}
               />
             </div>
             <p className="text-[11px] text-center text-[#C4D1DB] mt-3 italic">

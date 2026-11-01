@@ -20,7 +20,7 @@ test('resolveImageUrl correctly resolves various image formats and fallbacks', (
   assert.equal(resolveImageUrl('images/packages/thailand.jpeg'), '/images/packages/thailand.jpeg');
 
   // 4. Storage relative path
-  assert.ok(resolveImageUrl('packages/china-tour-123.jpg').includes('packages/china-tour-123.jpg'));
+  assert.ok(resolveImageUrl('packages/adventure-tour-123.jpg').includes('packages/adventure-tour-123.jpg'));
 });
 
 test('isVideoMedia correctly detects video files and video embeds', () => {
@@ -53,12 +53,12 @@ test('formatFileSize formats human readable file sizes', () => {
 test('normalizePackage standardizes database snake_case and camelCase attributes', () => {
   const rawDbRow = {
     id: 'f5e22b51-b81d-43ff-9ee7-ffaf46a7634e',
-    title: 'CHINA ',
-    slug: 'china',
-    destination: 'China',
+    title: 'Adventure Tour',
+    slug: 'adventure-tour',
+    destination: 'Adventureland',
     price: 250000,
     pricing_basis: 'per_person',
-    primary_image: '/images/packages/china.jpeg',
+    primary_image: '/images/packages/adventure.jpeg',
     duration_days: 7,
     category: 'solo',
     allowed_categories: ['solo'],
@@ -71,9 +71,9 @@ test('normalizePackage standardizes database snake_case and camelCase attributes
   };
 
   const normalized = normalizePackage(rawDbRow);
-  assert.equal(normalized.title, 'CHINA ');
-  assert.equal(normalized.slug, 'china');
-  assert.equal(normalized.primaryImage, '/images/packages/china.jpeg');
+  assert.equal(normalized.title, 'Adventure Tour');
+  assert.equal(normalized.slug, 'adventure-tour');
+  assert.equal(normalized.primaryImage, '/images/packages/adventure.jpeg');
   assert.equal(normalized.pricingBasis, 'per_person');
   assert.equal(normalized.durationDays, 7);
   assert.equal(normalized.category, 'solo');
@@ -85,7 +85,7 @@ test('normalizePackage standardizes database snake_case and camelCase attributes
   // Verify that getSoloPackages includes this normalized package
   const soloList = getSoloPackages([normalized]);
   assert.equal(soloList.length, 1);
-  assert.equal(soloList[0].slug, 'china');
+  assert.equal(soloList[0].slug, 'adventure-tour');
 
   // Verify that getFeaturedTours does NOT include it because isFeatured is false
   const featuredList = getFeaturedTours([normalized]);

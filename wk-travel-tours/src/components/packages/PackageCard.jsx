@@ -14,7 +14,17 @@ import { IconClock, IconShoppingBag, IconWhatsApp, IconCheck } from '@/component
 export function PackageCard({ pkg, priority = false }) {
   const addItem = useCartStore((state) => state.addItem);
   const [added, setAdded] = useState(false);
-  const [imageError, setImageError] = useState(false);
+
+  const rawImage =
+    pkg.primary_image ||
+    pkg.primaryImage ||
+    pkg.image_url ||
+    pkg.imageUrl ||
+    pkg.cover_image ||
+    pkg.coverImage ||
+    pkg.image ||
+    '';
+  const displayImage = resolveImageUrl(rawImage, 'package');
 
   const isCustomTrip =
     pkg.isCustomTripPromotion === true ||
@@ -44,14 +54,13 @@ export function PackageCard({ pkg, priority = false }) {
         className="relative aspect-[4/5] w-full bg-[#10263D] overflow-hidden block"
       >
         <Image
-          src={imageError ? '/images/packages/asia-grand-tour-4-countries.jpeg' : resolveImageUrl(pkg.primaryImage, 'package')}
+          src={displayImage}
           alt={pkg.title}
           fill
           priority={priority}
           sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
           className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-          onError={() => setImageError(true)}
-          unoptimized={resolveImageUrl(pkg.primaryImage, 'package').startsWith('http')}
+          unoptimized={displayImage.startsWith('http')}
         />
 
         {/* Top Badges */}

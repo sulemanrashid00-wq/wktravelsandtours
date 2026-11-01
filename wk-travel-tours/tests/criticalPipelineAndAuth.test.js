@@ -14,13 +14,13 @@ import {
 } from '../src/lib/utils/packageFilters.js';
 
 test('TEST 1 & 2 & 3: Package Image Isolation & Unique Association', () => {
-  const chinaPkg = normalizePackage({
-    id: 'pkg-china-001',
-    title: 'China Silk Road & Ancient Metros',
-    slug: 'china',
+  const adventurePkg = normalizePackage({
+    id: 'pkg-adv-001',
+    title: 'Central Asian Discovery',
+    slug: 'asia-discovery',
     category: 'solo',
     allowed_categories: ['solo'],
-    primary_image: 'https://lhuwxgbsrnhecljkzbfa.supabase.co/storage/v1/object/public/packages/china-great-wall.jpg',
+    primary_image: 'https://lhuwxgbsrnhecljkzbfa.supabase.co/storage/v1/object/public/packages/asia-discovery.jpg',
     price: 320000,
     is_active: true,
     is_featured: false,
@@ -51,27 +51,27 @@ test('TEST 1 & 2 & 3: Package Image Isolation & Unique Association', () => {
   });
 
   // Verify packages never share image references accidentally
-  assert.notEqual(chinaPkg.primaryImage, thailandPkg.primaryImage);
-  assert.notEqual(chinaPkg.primaryImage, japanPkg.primaryImage);
+  assert.notEqual(adventurePkg.primaryImage, thailandPkg.primaryImage);
+  assert.notEqual(adventurePkg.primaryImage, japanPkg.primaryImage);
   assert.notEqual(thailandPkg.primaryImage, japanPkg.primaryImage);
 
-  // Verify China image is correctly resolved
-  const resolvedChina = resolveImageUrl(chinaPkg.primaryImage, 'package');
-  assert.equal(resolvedChina, 'https://lhuwxgbsrnhecljkzbfa.supabase.co/storage/v1/object/public/packages/china-great-wall.jpg');
+  // Verify Adventure image is correctly resolved
+  const resolvedAdv = resolveImageUrl(adventurePkg.primaryImage, 'package');
+  assert.equal(resolvedAdv, 'https://lhuwxgbsrnhecljkzbfa.supabase.co/storage/v1/object/public/packages/asia-discovery.jpg');
 
-  // Verify China is in Solo and not in Friends, Family, Honeymoon, Visa
-  const catalog = [chinaPkg, thailandPkg, japanPkg];
+  // Verify Adventure pkg is in Solo and not in Friends, Family, Honeymoon, Visa
+  const catalog = [adventurePkg, thailandPkg, japanPkg];
   const soloList = getSoloPackages(catalog);
   const friendsList = getFriendsPackages(catalog);
   const familyList = getFamilyPackages(catalog);
   const honeymoonList = getHoneymoonPackages(catalog);
   const visaList = getVisaPackages(catalog);
 
-  assert.equal(soloList.some((p) => p.slug === 'china'), true);
-  assert.equal(friendsList.some((p) => p.slug === 'china'), false);
-  assert.equal(familyList.some((p) => p.slug === 'china'), false);
-  assert.equal(honeymoonList.some((p) => p.slug === 'china'), false);
-  assert.equal(visaList.some((p) => p.slug === 'china'), false);
+  assert.equal(soloList.some((p) => p.slug === 'asia-discovery'), true);
+  assert.equal(friendsList.some((p) => p.slug === 'asia-discovery'), false);
+  assert.equal(familyList.some((p) => p.slug === 'asia-discovery'), false);
+  assert.equal(honeymoonList.some((p) => p.slug === 'asia-discovery'), false);
+  assert.equal(visaList.some((p) => p.slug === 'asia-discovery'), false);
 });
 
 test('TEST 4 & 5: Image Replacement & Immutability when Unchanged', () => {
@@ -111,11 +111,12 @@ test('TEST 6: Validation Rejects Invalid Media and Retains Fallbacks', () => {
 
 test('TEST 7: Package Deletion Isolation', () => {
   const list = [
-    { id: '1', slug: 'china', isActive: true, category: 'solo' },
+    { id: '1', slug: 'asia-discovery', isActive: true, category: 'solo' },
     { id: '2', slug: 'thailand', isActive: true, category: 'solo' },
   ];
   const remaining = list.filter((p) => p.id !== '1');
   assert.equal(remaining.length, 1);
   assert.equal(remaining[0].slug, 'thailand');
-  assert.equal(getSoloPackages(remaining).some((p) => p.slug === 'china'), false);
+  assert.equal(getSoloPackages(remaining).some((p) => p.slug === 'asia-discovery'), false);
 });
+

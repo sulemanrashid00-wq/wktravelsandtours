@@ -348,17 +348,28 @@ function PackageListItem({ pkg }) {
   const whatsappUrl = buildWhatsAppUrl(siteConfig.contact.whatsapp, whatsappMessage);
   const customTripHref = `/custom-trip?type=${pkg.category || 'custom'}&destination=${encodeURIComponent(pkg.destination || '')}`;
 
+  const rawImage =
+    pkg.primary_image ||
+    pkg.primaryImage ||
+    pkg.image_url ||
+    pkg.imageUrl ||
+    pkg.cover_image ||
+    pkg.coverImage ||
+    pkg.image ||
+    '';
+  const displayImage = resolveImageUrl(rawImage, 'package');
+
   return (
     <article className="border border-[#E1E7EB] bg-white rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between hover:border-[#087E83] transition-all shadow-sm">
       <div className="flex gap-4 items-start sm:items-center">
         <div className="relative w-20 h-24 sm:w-28 sm:h-32 bg-[#10263D] rounded overflow-hidden flex-shrink-0">
           <Image
-            src={resolveImageUrl(pkg.primaryImage, 'package')}
+            src={displayImage}
             alt={pkg.title}
             fill
             className="object-contain"
             sizes="(max-width: 640px) 80px, 112px"
-            unoptimized={resolveImageUrl(pkg.primaryImage, 'package').startsWith('http')}
+            unoptimized={displayImage.startsWith('http')}
           />
         </div>
         <div className="space-y-1.5">

@@ -69,27 +69,21 @@ export async function POST(request) {
       );
     }
 
-    // Sanitize filename & extension
-    const originalName = file.name || 'upload.jpg';
-    const extMatch = originalName.match(/\.([a-zA-Z0-9]+)$/);
-    const extension = extMatch ? extMatch[1].toLowerCase() : 'jpg';
-
-    const safePrefix = prefix
-      .toString()
+    // Generate strictly unique filename: timestamp + random string + clean filename
+    const rawFileName = file.name || 'image.jpg';
+    const cleanFileName = rawFileName
       .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '-')
-      .replace(/-+/g, '-')
-      .slice(0, 40) || 'media';
-
+      .replace(/[^a-z0-9.-]/g, '-')
+      .replace(/-+/g, '-');
     const randomSuffix = Math.random().toString(36).substring(2, 8);
-    const fileName = `${safePrefix}-${Date.now()}-${randomSuffix}.${extension}`;
+    const fileName = `${Date.now()}-${randomSuffix}-${cleanFileName}`;
     const filePath = fileName;
 
     // Convert to buffer
     const arrayBuffer = await file.arrayBuffer();
     const fileBuffer = Buffer.from(arrayBuffer);
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage with upsert: true
     const { data: uploadData, error: uploadError } = await storageClient.storage
       .from(bucket)
       .upload(filePath, fileBuffer, {
@@ -112,7 +106,9 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       url: urlData.publicUrl,
+      publicUrl: urlData.publicUrl,
       path: filePath,
+      filePath,
       bucket,
       fileName,
       size: file.size,

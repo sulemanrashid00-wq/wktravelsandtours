@@ -18,6 +18,9 @@ import { AgencyWorkPreview } from '@/components/home/AgencyWorkPreview';
 import { TruthfulReviewsSection } from '@/components/home/TruthfulReviewsSection';
 import { IconPhone, IconWhatsApp, IconMapPin } from '@/components/ui/Icons';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata = {
   title: 'WK Travel & Tours | Journeys Beyond Boundaries',
   description:
@@ -25,7 +28,7 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  // Fetch live active packages (including admin additions like China) with instant fallback
+  // Fetch live active packages directly from the database
   const packages = await getAllPackages();
 
   // Filter packages using centralized classification engine with strict category isolation
