@@ -9,7 +9,6 @@ import { AdminCategoriesManager } from './AdminCategoriesManager';
 import { AdminBannersManager } from './AdminBannersManager';
 import { AdminReviewsModerator } from './AdminReviewsModerator';
 import { AdminAgencyWorkManager } from './AdminAgencyWorkManager';
-import { AdminBookingsViewer } from './AdminBookingsViewer';
 import { signOutUser } from '@/services/authService';
 import { IconShieldCheck } from '@/components/ui/Icons';
 import { Button } from '@/components/ui/Button';
@@ -34,7 +33,6 @@ export function AdminDashboard() {
     { id: 'banners', label: 'Promotional Banners' },
     { id: 'reviews', label: 'Reviews Moderation' },
     { id: 'work', label: 'Agency Work Gallery' },
-    { id: 'bookings', label: 'Inquiries & Bookings' },
   ];
 
   return (
@@ -133,7 +131,6 @@ export function AdminDashboard() {
         {activeTab === 'banners' && <AdminBannersManager />}
         {activeTab === 'reviews' && <AdminReviewsModerator />}
         {activeTab === 'work' && <AdminAgencyWorkManager />}
-        {activeTab === 'bookings' && <AdminBookingsViewer />}
       </main>
 
       {/* Admin Footer */}
