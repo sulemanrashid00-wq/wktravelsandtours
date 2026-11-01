@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { initialBanners } from '@/config/initialData';
+import { ImageUploadInput } from '@/components/ui/ImageUploadInput';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {
@@ -21,6 +23,7 @@ export function AdminBannersManager() {
   const [toastMessage, setToastMessage] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingBannerImage, setIsUploadingBannerImage] = useState(false);
 
   const showToast = (message, type = 'success') => {
     setToastMessage({ message, type });
@@ -259,10 +262,11 @@ export function AdminBannersManager() {
               <div>
                 <div className="relative aspect-[3/4] bg-[#10263D] overflow-hidden">
                   <Image
-                    src={banner.image || '/images/banners/family-package-banner.jpeg'}
+                    src={resolveImageUrl(banner.image, 'banner')}
                     alt={banner.title}
                     fill
                     className="object-cover"
+                    unoptimized={resolveImageUrl(banner.image, 'banner').startsWith('http')}
                   />
                   <div className="absolute top-3 left-3">
                     <Badge variant="teal" size="sm">
@@ -468,19 +472,22 @@ export function AdminBannersManager() {
                   />
                 </div>
 
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider text-[#10263D] mb-1">
-                    Banner Image Path *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingBanner?.image || ''}
-                    onChange={(e) => setEditingBanner({ ...editingBanner, image: e.target.value })}
-                    required
-                    placeholder="/images/banners/family-package-banner.jpeg"
-                    className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] font-mono focus:outline-none focus:border-[#087E83]"
-                  />
-                </div>
+              </div>
+
+              {/* Banner Graphic Upload */}
+              <div className="p-3 bg-[#F3F6F8] border border-[#E1E7EB] rounded-xl">
+                <ImageUploadInput
+                  value={editingBanner?.image || ''}
+                  onChange={(newUrl) => setEditingBanner({ ...editingBanner, image: newUrl })}
+                  onUploadStateChange={(uploading) => setIsUploadingBannerImage(uploading)}
+                  bucket="banners"
+                  prefix={editingBanner?.targetTripType || 'banner'}
+                  label="Campaign Graphic Flyer"
+                  helperText="Upload official promotional flyer (JPEG, PNG, WebP up to 10MB). Touch to open camera or phone gallery."
+                  aspectRatio="aspect-[3/4]"
+                  fit="contain"
+                  fallbackType="banner"
+                />
               </div>
 
               <div>
@@ -513,9 +520,9 @@ export function AdminBannersManager() {
                   type="submit"
                   variant="primary"
                   size="sm"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploadingBannerImage}
                 >
-                  {isSubmitting ? 'Saving...' : isCreating ? 'Create Banner' : 'Save Changes'}
+                  {isUploadingBannerImage ? 'Uploading Flyer...' : isSubmitting ? 'Saving...' : isCreating ? 'Create Banner' : 'Save Changes'}
                 </Button>
               </div>
             </form>

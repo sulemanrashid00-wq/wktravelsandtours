@@ -42,7 +42,7 @@ insert into public.agency_work (
   id, title, category, image_url, destination, description, highlights, travel_date, milestone, departure_point, display_order, is_published
 ) values
 (
-  'wk-work-01',
+  'd1000000-0000-0000-0000-000000000001',
   'KLIA International Departure & Documentation Check',
   'group',
   '/images/our-work/klia-airport-departure.jpeg',
@@ -56,7 +56,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-02',
+  'd1000000-0000-0000-0000-000000000002',
   'Group Boarding, In-Flight Logistics & Transit Hospitality',
   'group',
   '/images/our-work/flight-boarding-group.jpeg',
@@ -70,7 +70,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-03',
+  'd1000000-0000-0000-0000-000000000003',
   'Petronas Twin Towers Evening Illumination & Symphony Lake',
   'family',
   '/images/our-work/petronas-towers-night-solo.jpeg',
@@ -84,7 +84,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-04',
+  'd1000000-0000-0000-0000-000000000004',
   'Petronas Twin Towers Daylight Architectural Excursion',
   'group',
   '/images/our-work/petronas-towers-group-day.jpeg',
@@ -98,7 +98,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-05',
+  'd1000000-0000-0000-0000-000000000005',
   'KLCC Night Panorama Group Sightseeing Tour',
   'group',
   '/images/our-work/petronas-towers-group-night.jpeg',
@@ -112,7 +112,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-06',
+  'd1000000-0000-0000-0000-000000000006',
   'Batu Caves Golden Murugan & Rainbow Stairs Cultural Tour',
   'group',
   '/images/our-work/batu-caves-murugan-temple.jpeg',
@@ -126,7 +126,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-07',
+  'd1000000-0000-0000-0000-000000000007',
   'Istana Negara Royal Palace Grand Entrance & Heritage Tour',
   'vip',
   '/images/our-work/istana-negara-royal-palace.jpeg',
@@ -140,7 +140,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-08',
+  'd1000000-0000-0000-0000-000000000008',
   'Tugu Negara National Monument Cultural Heritage Visit',
   'group',
   '/images/our-work/tugu-negara-national-monument.jpeg',
@@ -154,7 +154,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-09',
+  'd1000000-0000-0000-0000-000000000009',
   'Kasturi Walk & Central Market Heritage Bazaar Shopping',
   'family',
   '/images/our-work/kasturi-walk-central-market.jpeg',
@@ -168,7 +168,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-10',
+  'd1000000-0000-0000-0000-000000000010',
   'Kilim Karst Geoforest Park Mangrove Speedboat Safari',
   'adventure',
   '/images/our-work/langkawi-geoforest-speedboat.jpeg',
@@ -182,7 +182,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-11',
+  'd1000000-0000-0000-0000-000000000011',
   'Langkawi River Estuary & Wildlife Ecology Boat Tour',
   'adventure',
   '/images/our-work/langkawi-mangrove-boat-tour.jpeg',
@@ -196,7 +196,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-12',
+  'd1000000-0000-0000-0000-000000000012',
   'Andaman Coastline Island Hopping & Coral Beach Safari',
   'adventure',
   '/images/our-work/langkawi-island-beach-safari.jpeg',
@@ -210,7 +210,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-13',
+  'd1000000-0000-0000-0000-000000000013',
   'Langkawi Sky Bridge & Gunung Mat Cincang Cloud Panorama',
   'vip',
   '/images/our-work/langkawi-sky-bridge-view.jpeg',
@@ -224,7 +224,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-14',
+  'd1000000-0000-0000-0000-000000000014',
   'Art in Paradise 3D Interactive Illusion Museum Excursion',
   'family',
   '/images/our-work/langkawi-3d-art-museum.jpeg',
@@ -238,7 +238,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-15',
+  'd1000000-0000-0000-0000-000000000015',
   'Dedicated Air-Conditioned VIP Chauffeur Ground Logistics',
   'vip',
   '/images/our-work/vip-van-private-transfer.jpeg',
@@ -252,7 +252,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-16',
+  'd1000000-0000-0000-0000-000000000016',
   'Skyline Luxury Hotel Rooftop Infinity Pool Hospitality',
   'family',
   '/images/our-work/hotel-infinity-pool-kuala-lumpur.jpeg',
@@ -266,7 +266,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-17',
+  'd1000000-0000-0000-0000-000000000017',
   'Colombo Transit Tour & Bandaranaike International Connection',
   'transit',
   '/images/our-work/sri-lanka-transit-colombo.jpeg',
@@ -280,7 +280,7 @@ insert into public.agency_work (
   true
 ),
 (
-  'wk-work-18',
+  'd1000000-0000-0000-0000-000000000018',
   'Multi-Airline International Transit & Terminal Baggage Flow',
   'transit',
   '/images/our-work/international-transit-departure.jpeg',

@@ -7,6 +7,7 @@ import { formatPKR } from '@/lib/utils/formatters';
 import { buildWhatsAppUrl, createPackageEnquiryWhatsAppMessage } from '@/lib/utils/whatsapp';
 import { useCartStore } from '@/stores/cartStore';
 import { siteConfig } from '@/config/site';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { Badge } from '@/components/ui/Badge';
 import { IconClock, IconShoppingBag, IconWhatsApp, IconCheck } from '@/components/ui/Icons';
 
@@ -43,13 +44,14 @@ export function PackageCard({ pkg, priority = false }) {
         className="relative aspect-[4/5] w-full bg-[#10263D] overflow-hidden block"
       >
         <Image
-          src={imageError ? '/images/packages/asia-grand-tour-4-countries.jpeg' : pkg.primaryImage}
+          src={imageError ? '/images/packages/asia-grand-tour-4-countries.jpeg' : resolveImageUrl(pkg.primaryImage, 'package')}
           alt={pkg.title}
           fill
           priority={priority}
           sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
           className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
           onError={() => setImageError(true)}
+          unoptimized={resolveImageUrl(pkg.primaryImage, 'package').startsWith('http')}
         />
 
         {/* Top Badges */}

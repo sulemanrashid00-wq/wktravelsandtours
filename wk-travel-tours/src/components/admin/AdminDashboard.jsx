@@ -41,9 +41,9 @@ export function AdminDashboard() {
     <div className="min-h-screen bg-white text-[#10263D] flex flex-col font-sans">
       {/* Admin Top Bar */}
       <header className="bg-[#10263D] text-white border-b border-[#0C1C2E] sticky top-0 z-30 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative w-9 h-9 rounded-full overflow-hidden bg-white p-1 flex-shrink-0 border border-white/20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden bg-white p-1 flex-shrink-0 border border-white/20">
               <Image
                 src="/images/logo/wk-travel-logo.jpeg"
                 alt="WK Travel & Tours"
@@ -51,42 +51,62 @@ export function AdminDashboard() {
                 className="object-contain"
               />
             </div>
-            <div>
-              <span className="font-heading font-bold text-base text-white block leading-tight">
+            <div className="min-w-0">
+              <span className="font-heading font-bold text-sm sm:text-base text-white block leading-tight truncate">
                 WK Travel & Tours
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-[#087E83] font-bold block">
-                Administrative Management Console
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-[#087E83] font-bold block truncate">
+                Admin Console
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2 text-xs shrink-0">
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded bg-white/10 text-white/90 border border-white/10">
               <IconShieldCheck className="w-4 h-4 text-[#087E83]" />
-              <span className="font-medium">Verified Administrator</span>
+              <span className="font-medium">Verified Admin</span>
             </div>
 
             <Link
               href="/"
               target="_blank"
-              className="px-3 py-1.5 border border-white/20 hover:bg-white/10 text-white rounded transition-colors text-xs font-medium"
+              className="px-2.5 py-1.5 border border-white/20 hover:bg-white/10 text-white rounded transition-colors text-xs font-medium"
             >
-              Public Website &rarr;
+              <span className="hidden sm:inline">Public Website &rarr;</span>
+              <span className="sm:hidden">Site &rarr;</span>
             </Link>
 
             <button
               type="button"
               onClick={handleSignOut}
-              className="px-3 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded font-semibold transition-colors text-xs"
+              className="px-2.5 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded font-semibold transition-colors text-xs"
             >
               Sign Out
             </button>
           </div>
         </div>
 
-        {/* Tab Navigation Strip */}
-        <div className="border-t border-white/10 bg-[#0C1C2E] overflow-x-auto">
+        {/* Mobile Tab Quick Selector (compact for phone screens) */}
+        <div className="block sm:hidden px-3 py-2 bg-[#0C1C2E] border-t border-white/10">
+          <label htmlFor="adminSectionSelect" className="sr-only">
+            Select Admin Section
+          </label>
+          <select
+            id="adminSectionSelect"
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full text-xs bg-[#10263D] text-white font-semibold border border-white/20 rounded-lg px-3 py-2 focus:outline-none focus:border-[#087E83]"
+          >
+            {tabs.map((tab) => (
+              <option key={tab.id} value={tab.id}>
+                📂 {tab.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Desktop & Tablet Tab Navigation Strip */}
+        <div className="hidden sm:block border-t border-white/10 bg-[#0C1C2E] overflow-x-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1">
             {tabs.map((tab) => (
               <button

@@ -15,8 +15,21 @@ import {
   IconChevronRight,
 } from '@/components/ui/Icons';
 import { siteConfig } from '@/config/site';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { OUR_WORK_ITEMS, OUR_WORK_CATEGORIES } from '@/config/ourWorkData';
 import { cleanWhatsAppPhone } from '@/lib/utils/whatsapp';
+
+// Normalizes category strings to standard slugs: 'group', 'family', 'adventure', 'vip', 'transit'
+function normalizeCategory(cat) {
+  if (!cat) return '';
+  const c = String(cat).toLowerCase().trim();
+  if (c === 'group' || c.includes('group')) return 'group';
+  if (c === 'family' || c.includes('family') || c.includes('leisure')) return 'family';
+  if (c === 'adventure' || c.includes('coastal') || c.includes('island') || c.includes('adventure')) return 'adventure';
+  if (c === 'vip' || c.includes('vip') || c.includes('transfer')) return 'vip';
+  if (c === 'transit' || c.includes('transit')) return 'transit';
+  return c;
+}
 
 export function OurWorkGallery() {
   const [activeTab, setActiveTab] = useState('all');
@@ -28,11 +41,13 @@ export function OurWorkGallery() {
     let isMounted = true;
     async function fetchOperations() {
       try {
-        const res = await fetch('/api/agency-work');
+        const res = await fetch('/api/agency-work', { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-            if (isMounted) setItems(json.data);
+            // Verify items do not recycle package flyers
+            const valid = json.data.filter((item) => !item.imageUrl?.includes('/images/packages/'));
+            if (isMounted) setItems(valid.length > 0 ? valid : OUR_WORK_ITEMS);
           }
         }
       } catch (err) {
@@ -47,7 +62,7 @@ export function OurWorkGallery() {
 
   const filtered = items.filter((item) => {
     if (activeTab === 'all') return true;
-    return item.category === activeTab;
+    return normalizeCategory(item.category) === activeTab;
   });
 
   // Lightbox keyboard navigation
@@ -77,7 +92,7 @@ export function OurWorkGallery() {
           const count =
             cat.id === 'all'
               ? items.length
-              : items.filter((i) => i.category === cat.id).length;
+              : items.filter((i) => normalizeCategory(i.category) === cat.id).length;
 
           return (
             <button
@@ -111,7 +126,7 @@ export function OurWorkGallery() {
       {/* Grid of Verified Operations */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((item, index) => {
-          const imgPath = item.imageUrl || '/images/our-work/klia-airport-departure.jpeg';
+          const imgPath = resolveImageUrl(item.imageUrl, 'work');
 
           return (
             <div
@@ -132,6 +147,7 @@ export function OurWorkGallery() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    unoptimized={imgPath.startsWith('http')}
                   />
                   <div className="absolute top-3 left-3 max-w-[85%]">
                     <Badge variant="dark" size="sm" className="truncate">

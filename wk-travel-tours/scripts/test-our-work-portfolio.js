@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const DEBUG_PORT = 9225;
+const PORT = process.env.PORT || '3000';
 
 async function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -109,7 +110,7 @@ async function runPortfolioTests() {
     // TEST 1: HOMEPAGE OUR WORK CAROUSEL & LIGHTBOX
     // -------------------------------------------------------------------------
     console.log('\n--- TEST 1: Homepage Agency Work Carousel & Lightbox ---');
-    await navigateTo('http://localhost:3001/');
+    await navigateTo(`http://localhost:${PORT}/`);
 
     const homepageWorkInfo = await evalScript(`(() => {
       const container = document.querySelector('[data-carousel-container="agency-work"]');
@@ -191,7 +192,7 @@ async function runPortfolioTests() {
     // TEST 2: FULL PORTFOLIO PAGE (/our-work)
     // -------------------------------------------------------------------------
     console.log('\n--- TEST 2: Full Portfolio Page (/our-work) & Category Filtering ---');
-    await navigateTo('http://localhost:3001/our-work');
+    await navigateTo(`http://localhost:${PORT}/our-work`);
 
     const portfolioInfo = await evalScript(`(() => {
       const cards = document.querySelectorAll('[data-work-item-id]');
@@ -303,7 +304,7 @@ async function runPortfolioTests() {
       domain: 'localhost',
       path: '/',
     });
-    await navigateTo('http://localhost:3001/admin');
+    await navigateTo(`http://localhost:${PORT}/admin`);
 
     // Switch to Agency Work tab
     await evalScript(`(() => {

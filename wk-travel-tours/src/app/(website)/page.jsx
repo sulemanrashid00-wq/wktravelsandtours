@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { initialPackages } from '@/config/initialData';
+import { getAllPackages } from '@/services/packageService';
 import {
   getFeaturedTours,
   getSoloPackages,
@@ -24,14 +24,17 @@ export const metadata = {
     'Premier Karachi travel agency offering curated international packages, customized group & family vacations, and transparent visit visa processing.',
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch live active packages (including admin additions like China) with instant fallback
+  const packages = await getAllPackages();
+
   // Filter packages using centralized classification engine with strict category isolation
-  const featuredPackages = getFeaturedTours(initialPackages);
-  const soloPackages = getSoloPackages(initialPackages);
-  const friendsPackages = getFriendsPackages(initialPackages);
-  const familyPackages = getFamilyPackages(initialPackages);
-  const honeymoonPackages = getHoneymoonPackages(initialPackages);
-  const visaPackages = getVisaPackages(initialPackages);
+  const featuredPackages = getFeaturedTours(packages);
+  const soloPackages = getSoloPackages(packages);
+  const friendsPackages = getFriendsPackages(packages);
+  const familyPackages = getFamilyPackages(packages);
+  const honeymoonPackages = getHoneymoonPackages(packages);
+  const visaPackages = getVisaPackages(packages);
 
   return (
     <div className="flex flex-col w-full bg-white">

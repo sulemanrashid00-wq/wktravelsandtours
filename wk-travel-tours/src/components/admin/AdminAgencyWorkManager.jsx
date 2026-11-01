@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
+import { ImageUploadInput } from '@/components/ui/ImageUploadInput';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { OUR_WORK_ITEMS, OUR_WORK_CATEGORIES } from '@/config/ourWorkData';
 import {
   IconClose,
@@ -23,6 +25,7 @@ export function AdminAgencyWorkManager() {
   const [toastMessage, setToastMessage] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -330,11 +333,12 @@ export function AdminAgencyWorkManager() {
               <div>
                 <div className="relative aspect-[16/10] bg-[#10263D] overflow-hidden">
                   <Image
-                    src={item.imageUrl || '/images/our-work/klia-airport-departure.jpeg'}
+                    src={resolveImageUrl(item.imageUrl, 'work')}
                     alt={item.title}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 33vw"
+                    unoptimized={resolveImageUrl(item.imageUrl, 'work').startsWith('http')}
                   />
                   <div className="absolute top-2.5 left-2.5">
                     <span className="bg-[#10263D]/90 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">
@@ -556,29 +560,20 @@ export function AdminAgencyWorkManager() {
                 </div>
               </div>
 
-              {/* Quick Image Picker or Custom Path */}
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-[#10263D] mb-1">
-                  Choose Authentic Photo *
-                </label>
-                <select
+              {/* Media Upload & Selection */}
+              <div className="p-3 bg-[#F3F6F8] border border-[#E1E7EB] rounded-xl">
+                <ImageUploadInput
                   value={editingItem?.imageUrl || ''}
-                  onChange={(e) => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
-                  className="w-full text-xs bg-white border border-[#E1E7EB] rounded-lg px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83] mb-2"
-                >
-                  {OUR_WORK_ITEMS.map((item) => (
-                    <option key={item.id} value={item.imageUrl}>
-                      {item.newFile} - {item.title}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  value={editingItem?.imageUrl || ''}
-                  onChange={(e) => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
-                  required
-                  placeholder="/images/our-work/klia-airport-departure.jpeg"
-                  className="w-full text-xs bg-white border border-[#E1E7EB] rounded-lg px-3 py-2 text-[#10263D] font-mono focus:outline-none focus:border-[#087E83]"
+                  onChange={(newUrl) => setEditingItem({ ...editingItem, imageUrl: newUrl })}
+                  onUploadStateChange={(uploading) => setIsUploadingMedia(uploading)}
+                  bucket="agency-work"
+                  prefix={editingItem?.category || 'work'}
+                  label="Authentic Operation Photo or Video"
+                  helperText="Select JPEG, JPG, PNG, WebP or MP4/WebM video (up to 50MB). Direct mobile gallery & camera support."
+                  aspectRatio="aspect-[4/3]"
+                  fit="cover"
+                  allowVideo={true}
+                  fallbackType="work"
                 />
               </div>
 
@@ -623,9 +618,9 @@ export function AdminAgencyWorkManager() {
                   type="submit"
                   variant="primary"
                   size="sm"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploadingMedia}
                 >
-                  {isSubmitting ? 'Saving...' : isCreating ? 'Create Record' : 'Save Changes'}
+                  {isUploadingMedia ? 'Uploading Media...' : isSubmitting ? 'Saving...' : isCreating ? 'Create Record' : 'Save Changes'}
                 </Button>
               </div>
             </form>

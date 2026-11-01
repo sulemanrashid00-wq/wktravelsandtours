@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { siteConfig } from '@/config/site';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { OUR_WORK_ITEMS } from '@/config/ourWorkData';
 import { cleanWhatsAppPhone } from '@/lib/utils/whatsapp';
 import {
@@ -47,11 +48,12 @@ export function AgencyWorkPreview() {
     let isMounted = true;
     async function fetchWork() {
       try {
-        const res = await fetch('/api/agency-work');
+        const res = await fetch('/api/agency-work', { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-            if (isMounted) setWorkItems(json.data);
+            const valid = json.data.filter((item) => !item.imageUrl?.includes('/images/packages/'));
+            if (isMounted) setWorkItems(valid.length > 0 ? valid : OUR_WORK_ITEMS);
             return;
           }
         }
@@ -319,7 +321,7 @@ export function AgencyWorkPreview() {
           aria-label="Verified agency work carousel"
         >
           {workItems.map((item, idx) => {
-            const imgPath = item.imageUrl || '/images/our-work/klia-airport-departure.jpeg';
+            const imgPath = resolveImageUrl(item.imageUrl, 'work');
             return (
               <div
                 key={item.id || idx}
@@ -338,6 +340,7 @@ export function AgencyWorkPreview() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       sizes="(max-width: 768px) 280px, 360px"
+                      unoptimized={imgPath.startsWith('http')}
                     />
                     <div className="absolute top-3 left-3 max-w-[85%]">
                       <Badge variant="dark" size="sm" className="truncate">

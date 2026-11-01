@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { initialPackages } from '@/config/initialData';
+import { getAllPackages, getPackageBySlug } from '@/services/packageService';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { isVisaPackage } from '@/lib/utils/packageFilters';
 import { siteConfig } from '@/config/site';
 import { PackageDetailActions } from '@/components/packages/PackageDetailActions';
@@ -14,6 +16,8 @@ import {
   IconShieldCheck,
 } from '@/components/ui/Icons';
 
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   return initialPackages.map((pkg) => ({
     slug: pkg.slug,
@@ -22,7 +26,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const pkg = initialPackages.find((p) => p.slug === slug);
+  const pkg = (await getPackageBySlug(slug)) || initialPackages.find((p) => p.slug === slug);
   if (!pkg) return { title: 'Package Not Found' };
 
   const isCustomTrip =
@@ -36,18 +40,18 @@ export async function generateMetadata({ params }) {
 
   return {
     title: `${pkg.title} | ${siteConfig.name}`,
-    description: `${pkg.subtitle} - ${rateText}. Inclusions: ${pkg.inclusions.slice(0, 4).join(', ')}.`,
+    description: `${pkg.subtitle} - ${rateText}. Inclusions: ${(pkg.inclusions || []).slice(0, 4).join(', ')}.`,
     openGraph: {
       title: `${pkg.title} | ${siteConfig.name}`,
-      description: pkg.tagline,
-      images: [{ url: pkg.primaryImage }],
+      description: pkg.tagline || pkg.subtitle,
+      images: [{ url: resolveImageUrl(pkg.primaryImage, 'package') }],
     },
   };
 }
 
 export default async function PackageDetailPage({ params }) {
   const { slug } = await params;
-  const pkg = initialPackages.find((p) => p.slug === slug);
+  const pkg = (await getPackageBySlug(slug)) || initialPackages.find((p) => p.slug === slug);
 
   if (!pkg) {
     notFound();
@@ -62,15 +66,15 @@ export default async function PackageDetailPage({ params }) {
   // - Visa packages only recommend other visa options
   // - Holiday tours never recommend visa services
   const isVisa = isVisaPackage(pkg);
-  const relatedPackages = initialPackages
+  const allPackages = await getAllPackages();
+  const relatedPackages = allPackages
     .filter((p) => {
       if (p.slug === pkg.slug) return false;
       if (isVisa) return isVisaPackage(p);
       if (isVisaPackage(p)) return false;
       return (
-        p.destination === pkg.destination ||
-        (pkg.category && p.category === pkg.category) ||
-        (Array.isArray(pkg.allowedCategories) && pkg.allowedCategories.some((c) => p.allowedCategories?.includes(c)))
+        p.category === pkg.category ||
+        (Array.isArray(p.allowedCategories) && p.allowedCategories.includes(pkg.category))
       );
     })
     .slice(0, 4);
@@ -131,12 +135,13 @@ export default async function PackageDetailPage({ params }) {
           <div className="lg:col-span-5 bg-[#10263D] rounded-xl p-3 sm:p-5 border border-[#E1E7EB] shadow-sm">
             <div className="relative aspect-[3/4] w-full max-w-md mx-auto rounded overflow-hidden">
               <Image
-                src={pkg.primaryImage}
+                src={resolveImageUrl(pkg.primaryImage, 'package')}
                 alt={pkg.title}
                 fill
                 priority
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 40vw"
+                unoptimized={resolveImageUrl(pkg.primaryImage, 'package').startsWith('http')}
               />
             </div>
             <p className="text-[11px] text-center text-[#C4D1DB] mt-3 italic">

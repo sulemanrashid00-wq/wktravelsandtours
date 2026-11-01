@@ -4,14 +4,38 @@ import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { initialBanners } from '@/config/initialData';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { Badge } from '@/components/ui/Badge';
 import { IconChevronLeft, IconChevronRight } from '@/components/ui/Icons';
 
 export function PromotionalBannerSlider({ autoPlayInterval = 5500, enableAutoPlay = true }) {
+  const [banners, setBanners] = useState(initialBanners);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
   const timerRef = useRef(null);
+
+  // Fetch live banners on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function loadLiveBanners() {
+      try {
+        const res = await fetch('/api/banners');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            if (isMounted) setBanners(json.data);
+          }
+        }
+      } catch {
+        // Fallback
+      }
+    }
+    loadLiveBanners();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Detect user system reduced-motion preference
   useEffect(() => {
@@ -27,30 +51,30 @@ export function PromotionalBannerSlider({ autoPlayInterval = 5500, enableAutoPla
   const prevSlide = () => {
     setIsPaused(true);
     setTimeout(() => setIsPaused(false), 4000);
-    setCurrentIndex((prev) => (prev === 0 ? initialBanners.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
   };
 
   const nextSlide = () => {
     setIsPaused(true);
     setTimeout(() => setIsPaused(false), 4000);
-    setCurrentIndex((prev) => (prev === initialBanners.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
   };
 
   // Autonomous auto-advance with pause on interaction
   useEffect(() => {
-    if (!enableAutoPlay || isReducedMotion || isPaused || initialBanners.length <= 1) {
+    if (!enableAutoPlay || isReducedMotion || isPaused || banners.length <= 1) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
 
     timerRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev === initialBanners.length - 1 ? 0 : prev + 1));
+      setCurrentIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
     }, autoPlayInterval);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [enableAutoPlay, isReducedMotion, isPaused, autoPlayInterval]);
+  }, [enableAutoPlay, isReducedMotion, isPaused, autoPlayInterval, banners.length]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowLeft') {
@@ -62,7 +86,7 @@ export function PromotionalBannerSlider({ autoPlayInterval = 5500, enableAutoPla
     }
   };
 
-  const currentBanner = initialBanners[currentIndex];
+  const currentBanner = banners[currentIndex] || banners[0] || initialBanners[0];
 
   return (
     <section
@@ -125,12 +149,13 @@ export function PromotionalBannerSlider({ autoPlayInterval = 5500, enableAutoPla
           <div className="lg:col-span-5 bg-[#10263D] p-4 sm:p-6 flex items-center justify-center">
             <div className="relative aspect-[3/4] w-full max-w-sm rounded-lg overflow-hidden border border-[#E1E7EB]/20 shadow-md">
               <Image
-                src={currentBanner.image}
+                src={resolveImageUrl(currentBanner.image, 'banner')}
                 alt={currentBanner.title}
                 fill
                 priority
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 40vw"
+                unoptimized={resolveImageUrl(currentBanner.image, 'banner').startsWith('http')}
               />
             </div>
           </div>

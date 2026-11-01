@@ -6,6 +6,7 @@ import { initialPackages, initialCategories } from '@/config/initialData';
 import { getPackagesByCategory } from '@/lib/utils/packageFilters';
 import { PackageCard } from './PackageCard';
 import { formatPKR } from '@/lib/utils/formatters';
+import { resolveImageUrl } from '@/lib/utils/media';
 import { buildWhatsAppUrl, createPackageEnquiryWhatsAppMessage } from '@/lib/utils/whatsapp';
 import { siteConfig } from '@/config/site';
 import { useCartStore } from '@/stores/cartStore';
@@ -28,12 +29,35 @@ export function PackageCatalogue() {
   const initialSearch = searchParams.get('search') || '';
   const initialCategory = searchParams.get('category') || 'all';
 
+  const [allPackages, setAllPackages] = useState(initialPackages);
   const [search, setSearch] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [budgetFilter, setBudgetFilter] = useState('all');
   const [durationFilter, setDurationFilter] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+
+  // Fetch live active packages on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function loadLivePackages() {
+      try {
+        const res = await fetch('/api/packages');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            if (isMounted) setAllPackages(json.data);
+          }
+        }
+      } catch {
+        // Fallback retained
+      }
+    }
+    loadLivePackages();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Sync with searchParams on navigation
   useEffect(() => {
@@ -46,7 +70,7 @@ export function PackageCatalogue() {
   // Filter and sort logic using centralized classification
   const filteredPackages = useMemo(() => {
     // 1. Category isolation step
-    const categorySubset = getPackagesByCategory(initialPackages, selectedCategory);
+    const categorySubset = getPackagesByCategory(allPackages, selectedCategory);
 
     // 2. Search, budget, duration filters
     return categorySubset
@@ -329,10 +353,12 @@ function PackageListItem({ pkg }) {
       <div className="flex gap-4 items-start sm:items-center">
         <div className="relative w-20 h-24 sm:w-28 sm:h-32 bg-[#10263D] rounded overflow-hidden flex-shrink-0">
           <Image
-            src={pkg.primaryImage}
+            src={resolveImageUrl(pkg.primaryImage, 'package')}
             alt={pkg.title}
             fill
             className="object-contain"
+            sizes="(max-width: 640px) 80px, 112px"
+            unoptimized={resolveImageUrl(pkg.primaryImage, 'package').startsWith('http')}
           />
         </div>
         <div className="space-y-1.5">

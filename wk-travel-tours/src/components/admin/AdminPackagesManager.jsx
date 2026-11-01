@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { initialPackages } from '@/config/initialData';
 import { formatPKR } from '@/lib/utils/formatters';
+import { resolveImageUrl } from '@/lib/utils/media';
+import { ImageUploadInput } from '@/components/ui/ImageUploadInput';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {
@@ -33,6 +35,8 @@ export function AdminPackagesManager() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [editingPackage, setEditingPackage] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -349,6 +353,11 @@ export function AdminPackagesManager() {
       p.destination?.toLowerCase().includes(search.toLowerCase());
 
     if (!matchesSearch) return false;
+
+    // Status filter
+    if (statusFilter === 'published' && p.isActive === false) return false;
+    if (statusFilter === 'draft' && p.isActive !== false) return false;
+
     if (categoryFilter === 'all') return true;
     if (categoryFilter === 'featured') return p.isFeatured === true;
 
@@ -416,26 +425,168 @@ export function AdminPackagesManager() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <IconFilter className="w-4 h-4 text-[#586775] hidden sm:block" />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <IconFilter className="w-3.5 h-3.5 text-[#586775]" />
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="text-xs bg-white border border-[#E1E7EB] rounded px-2.5 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
+            >
+              <option value="all">All Categories ({packages.length})</option>
+              <option value="featured">Featured On Homepage</option>
+              <option value="solo">Solo Travel</option>
+              <option value="friends">Friends & Groups</option>
+              <option value="family">Family Vacations</option>
+              <option value="honeymoon">Honeymoon Escapes</option>
+              <option value="visa">Visit Visas</option>
+            </select>
+          </div>
+
           <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="text-xs bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="text-xs bg-white border border-[#E1E7EB] rounded px-2.5 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
           >
-            <option value="all">All Categories ({packages.length})</option>
-            <option value="featured">Featured On Homepage</option>
-            <option value="solo">Solo Travel</option>
-            <option value="friends">Friends & Groups</option>
-            <option value="family">Family Vacations</option>
-            <option value="honeymoon">Honeymoon Escapes</option>
-            <option value="visa">Visit Visas</option>
+            <option value="all">All Status</option>
+            <option value="published">Published Only</option>
+            <option value="draft">Draft Only</option>
           </select>
         </div>
       </div>
 
-      {/* Packages Table */}
-      <div className="border border-[#E1E7EB] bg-white rounded-lg shadow-sm overflow-x-auto">
+      {/* MOBILE VIEW: Responsive Card Layout (< 768px) */}
+      <div className="block md:hidden space-y-3.5">
+        {loading ? (
+          <div className="py-12 text-center text-[#586775] bg-white border border-[#E1E7EB] rounded-xl p-6">
+            <div className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4 border-2 border-[#087E83] border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs">Loading database packages...</span>
+            </div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="py-12 text-center text-[#586775] bg-white border border-[#E1E7EB] rounded-xl p-6 text-xs">
+            No packages found matching your criteria.
+          </div>
+        ) : (
+          filtered.map((pkg) => {
+            const displayImg = resolveImageUrl(pkg.primaryImage, 'package');
+            return (
+              <div
+                key={pkg.id}
+                className="p-4 bg-white border border-[#E1E7EB] rounded-xl shadow-xs space-y-3"
+              >
+                <div className="flex gap-3 items-start">
+                  <div className="relative w-16 h-20 bg-[#10263D] rounded-lg overflow-hidden flex-shrink-0 border border-[#E1E7EB]">
+                    <Image
+                      src={displayImg}
+                      alt={pkg.title}
+                      fill
+                      className="object-contain"
+                      sizes="64px"
+                      unoptimized={displayImg.startsWith('http')}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] uppercase font-bold text-[#087E83] bg-[#087E83]/10 px-1.5 py-0.5 rounded">
+                        {pkg.destination}
+                      </span>
+                      {pkg.serviceType === 'visa' && (
+                        <span className="text-[10px] uppercase font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                          Visa
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="font-heading font-bold text-sm text-[#10263D] mt-1 leading-snug">
+                      {pkg.title}
+                    </h4>
+                    <span className="text-[10px] text-[#586775] block mt-0.5 font-mono truncate">
+                      /{pkg.slug}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Rate & Duration */}
+                <div className="flex items-center justify-between pt-2 border-t border-[#E1E7EB] text-xs">
+                  <div>
+                    <span className="text-[10px] text-[#586775] block">Confirmed Rate</span>
+                    <span className="font-bold text-[#10263D] text-sm">{formatPKR(pkg.price)}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-[#586775] block">Duration</span>
+                    <span className="font-medium text-[#10263D]">{pkg.duration}</span>
+                  </div>
+                </div>
+
+                {/* Categories */}
+                <div className="flex flex-wrap gap-1">
+                  {(pkg.allowedCategories || pkg.categories || [pkg.category || 'solo']).map((cat) => (
+                    <span
+                      key={cat}
+                      className="text-[10px] bg-[#F3F6F8] text-[#10263D] px-2 py-0.5 rounded border border-[#E1E7EB]"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Toggle Flags: Featured & Publish */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#E1E7EB]">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFeatured(pkg)}
+                    className={`py-2 px-3 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors min-h-[44px] ${
+                      pkg.isFeatured
+                        ? 'bg-[#087E83] text-white shadow-xs'
+                        : 'bg-[#F3F6F8] text-[#586775] border border-[#E1E7EB]'
+                    }`}
+                  >
+                    <span>★</span>
+                    <span>{pkg.isFeatured ? 'Featured' : 'Standard'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(pkg)}
+                    className={`py-2 px-3 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors min-h-[44px] ${
+                      pkg.isActive !== false
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                        : 'bg-gray-100 text-gray-700 border border-gray-300'
+                    }`}
+                  >
+                    <span>{pkg.isActive !== false ? '● Published' : '○ Draft'}</span>
+                  </button>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(pkg)}
+                    className="py-2.5 px-3 bg-white border border-[#087E83] text-[#087E83] hover:bg-teal-50 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
+                  >
+                    <IconEdit className="w-4 h-4" />
+                    <span>Edit Details</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirmation({ id: pkg.id, title: pkg.title })}
+                    className="py-2.5 px-3 bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
+                  >
+                    <IconTrash className="w-4 h-4" />
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* DESKTOP VIEW: Full Data Table (>= 768px) */}
+      <div className="hidden md:block border border-[#E1E7EB] bg-white rounded-lg shadow-sm overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-[#E1E7EB] bg-[#F3F6F8] text-[#10263D] uppercase tracking-wider font-semibold">
@@ -466,129 +617,133 @@ export function AdminPackagesManager() {
                 </td>
               </tr>
             ) : (
-              filtered.map((pkg) => (
-                <tr key={pkg.id} className="hover:bg-[#F3F6F8]/60 transition-colors">
-                  {/* Title & Image */}
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-14 bg-[#10263D] rounded overflow-hidden flex-shrink-0 border border-[#E1E7EB]">
-                        <Image
-                          src={pkg.primaryImage || '/images/packages/thailand-bangkok-pattaya-phuket.jpeg'}
-                          alt={pkg.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <span className="font-heading font-bold text-[#10263D] block max-w-xs truncate">
-                          {pkg.title}
-                        </span>
-                        <span className="text-[10px] text-[#586775] font-mono">
-                          /{pkg.slug}
-                        </span>
-                        {pkg.serviceType === 'visa' && (
-                          <span className="inline-block mt-0.5 text-[9px] uppercase font-bold text-[#087E83] bg-[#087E83]/10 px-1.5 py-0.2 rounded">
-                            Visa Service
+              filtered.map((pkg) => {
+                const displayImg = resolveImageUrl(pkg.primaryImage, 'package');
+                return (
+                  <tr key={pkg.id} className="hover:bg-[#F3F6F8]/60 transition-colors">
+                    {/* Title & Image */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-12 h-14 bg-[#10263D] rounded overflow-hidden flex-shrink-0 border border-[#E1E7EB]">
+                          <Image
+                            src={displayImg}
+                            alt={pkg.title}
+                            fill
+                            className="object-cover"
+                            unoptimized={displayImg.startsWith('http')}
+                          />
+                        </div>
+                        <div>
+                          <span className="font-heading font-bold text-[#10263D] block max-w-xs truncate">
+                            {pkg.title}
                           </span>
-                        )}
+                          <span className="text-[10px] text-[#586775] font-mono">
+                            /{pkg.slug}
+                          </span>
+                          {pkg.serviceType === 'visa' && (
+                            <span className="inline-block mt-0.5 text-[9px] uppercase font-bold text-[#087E83] bg-[#087E83]/10 px-1.5 py-0.2 rounded">
+                              Visa Service
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Destination */}
-                  <td className="py-3.5 px-4 font-medium text-[#10263D]">
-                    {pkg.destination}
-                  </td>
+                    {/* Destination */}
+                    <td className="py-3.5 px-4 font-medium text-[#10263D]">
+                      {pkg.destination}
+                    </td>
 
-                  {/* Classification */}
-                  <td className="py-3.5 px-4">
-                    <div className="flex flex-wrap gap-1 max-w-xs">
-                      {(pkg.allowedCategories || pkg.categories || [pkg.category || 'solo']).map((cat) => (
-                        <span
-                          key={cat}
-                          className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F3F6F8] text-[#10263D] border border-[#E1E7EB]"
+                    {/* Classification */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex flex-wrap gap-1 max-w-xs">
+                        {(pkg.allowedCategories || pkg.categories || [pkg.category || 'solo']).map((cat) => (
+                          <span
+                            key={cat}
+                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F3F6F8] text-[#10263D] border border-[#E1E7EB]"
+                          >
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    {/* Confirmed Rate */}
+                    <td className="py-3.5 px-4 font-bold text-[#10263D]">
+                      {formatPKR(pkg.price)}
+                      <span className="text-[10px] text-[#586775] block font-normal">
+                        {pkg.pricingBasis === 'per_person'
+                          ? 'Per Person'
+                          : pkg.pricingBasis === 'visa_only'
+                          ? 'Visa / Consular Fee'
+                          : 'Fixed Group Rate'}
+                      </span>
+                    </td>
+
+                    {/* Duration */}
+                    <td className="py-3.5 px-4 text-[#586775]">
+                      {pkg.duration}
+                    </td>
+
+                    {/* Featured Toggle */}
+                    <td className="py-3.5 px-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFeatured(pkg)}
+                        title="Click to toggle homepage featured status"
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+                          pkg.isFeatured
+                            ? 'bg-[#087E83] text-white'
+                            : 'bg-white text-[#586775] border border-[#E1E7EB] hover:border-[#087E83]'
+                        }`}
+                      >
+                        {pkg.isFeatured ? 'Featured' : 'Standard'}
+                      </button>
+                    </td>
+
+                    {/* Status Toggle */}
+                    <td className="py-3.5 px-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleActive(pkg)}
+                        title="Click to toggle publish status"
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+                          pkg.isActive !== false
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                            : 'bg-gray-100 text-gray-700 border border-gray-300'
+                        }`}
+                      >
+                        {pkg.isActive !== false ? 'Published' : 'Draft'}
+                      </button>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditModal(pkg)}
+                          title="Edit package details"
+                          className="h-7 px-2 text-xs"
                         >
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-
-                  {/* Confirmed Rate */}
-                  <td className="py-3.5 px-4 font-bold text-[#10263D]">
-                    {formatPKR(pkg.price)}
-                    <span className="text-[10px] text-[#586775] block font-normal">
-                      {pkg.pricingBasis === 'per_person'
-                        ? 'Per Person'
-                        : pkg.pricingBasis === 'visa_only'
-                        ? 'Visa / Consular Fee'
-                        : 'Fixed Group Rate'}
-                    </span>
-                  </td>
-
-                  {/* Duration */}
-                  <td className="py-3.5 px-4 text-[#586775]">
-                    {pkg.duration}
-                  </td>
-
-                  {/* Featured Toggle */}
-                  <td className="py-3.5 px-4 text-center">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleFeatured(pkg)}
-                      title="Click to toggle homepage featured status"
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider transition-colors ${
-                        pkg.isFeatured
-                          ? 'bg-[#087E83] text-white'
-                          : 'bg-white text-[#586775] border border-[#E1E7EB] hover:border-[#087E83]'
-                      }`}
-                    >
-                      {pkg.isFeatured ? 'Featured' : 'Standard'}
-                    </button>
-                  </td>
-
-                  {/* Status Toggle */}
-                  <td className="py-3.5 px-4 text-center">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleActive(pkg)}
-                      title="Click to toggle publish status"
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider transition-colors ${
-                        pkg.isActive !== false
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-                          : 'bg-gray-100 text-gray-700 border border-gray-300'
-                      }`}
-                    >
-                      {pkg.isActive !== false ? 'Published' : 'Draft'}
-                    </button>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="py-3.5 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditModal(pkg)}
-                        title="Edit package details"
-                        className="h-7 px-2 text-xs"
-                      >
-                        <IconEdit className="w-3.5 h-3.5 text-[#087E83]" />
-                        <span className="hidden sm:inline">Edit</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeleteConfirmation({ id: pkg.id, title: pkg.title })}
-                        title="Delete package"
-                        className="h-7 px-2 text-xs text-red-600 hover:bg-red-50"
-                      >
-                        <IconTrash className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                          <IconEdit className="w-3.5 h-3.5 text-[#087E83]" />
+                          <span className="hidden sm:inline">Edit</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteConfirmation({ id: pkg.id, title: pkg.title })}
+                          title="Delete package"
+                          className="h-7 px-2 text-xs text-red-600 hover:bg-red-50"
+                        >
+                          <IconTrash className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -918,34 +1073,34 @@ export function AdminPackagesManager() {
                 </div>
               </div>
 
-              {/* Subtitle & Image */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider text-[#10263D] mb-1">
-                    Tagline / Subtitle
-                  </label>
-                  <input
-                    type="text"
-                    value={editingPackage?.subtitle || ''}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, subtitle: e.target.value })}
-                    placeholder="e.g. City Lights, Beaches, Fun, Island Vibes & Nature"
-                    className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
-                  />
-                </div>
+              {/* Subtitle */}
+              <div>
+                <label className="block font-semibold uppercase tracking-wider text-[#10263D] mb-1">
+                  Tagline / Subtitle
+                </label>
+                <input
+                  type="text"
+                  value={editingPackage?.subtitle || ''}
+                  onChange={(e) => setEditingPackage({ ...editingPackage, subtitle: e.target.value })}
+                  placeholder="e.g. City Lights, Beaches, Fun, Island Vibes & Nature"
+                  className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] focus:outline-none focus:border-[#087E83]"
+                />
+              </div>
 
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider text-[#10263D] mb-1">
-                    Primary Image Path *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingPackage?.primaryImage || ''}
-                    onChange={(e) => setEditingPackage({ ...editingPackage, primaryImage: e.target.value })}
-                    required
-                    placeholder="/images/packages/thailand-bangkok-pattaya-phuket.jpeg"
-                    className="w-full text-xs sm:text-sm bg-white border border-[#E1E7EB] rounded px-3 py-2 text-[#10263D] font-mono focus:outline-none focus:border-[#087E83]"
-                  />
-                </div>
+              {/* Real Media Management with Cloud Storage Upload */}
+              <div className="p-4 bg-[#F3F6F8] border border-[#E1E7EB] rounded-xl">
+                <ImageUploadInput
+                  value={editingPackage?.primaryImage || ''}
+                  onChange={(newUrl) => setEditingPackage({ ...editingPackage, primaryImage: newUrl })}
+                  onUploadStateChange={(uploading) => setIsUploadingImage(uploading)}
+                  bucket="packages"
+                  prefix={editingPackage?.slug || 'package'}
+                  label="Package Primary Poster / Image"
+                  helperText="Upload official promotional flyer (JPEG, PNG, WebP up to 10MB). Touch to open camera or phone gallery."
+                  aspectRatio="aspect-[3/4]"
+                  fit="contain"
+                  fallbackType="package"
+                />
               </div>
 
               {/* Inclusions & Exclusions */}
@@ -1030,9 +1185,11 @@ export function AdminPackagesManager() {
                   type="submit"
                   variant="primary"
                   size="sm"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploadingImage}
                 >
-                  {isSubmitting
+                  {isUploadingImage
+                    ? 'Uploading Media to Cloud...'
+                    : isSubmitting
                     ? 'Saving Changes...'
                     : isCreating
                     ? 'Create Package Record'
